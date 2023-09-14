@@ -1,0 +1,48 @@
+<!--
+  @description       : 
+  @author            : clabelle@everstream.net
+  @group             : 
+  @last modified on  : 08-24-2023
+  @last modified by  : clabelle@everstream.net
+-->
+<aura:component controller="SOFDisconnectPanelController" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="projectTasks" type="List" />
+    <aura:attribute name="orderInfo" type="Object" />
+
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+
+    <form>
+      <aura:if isTrue="{!v.orderInfo.Status == 'Activated'}">
+        <div>
+          <div class="heading">Initiate Disconnect Process</div>
+          <lightning:layout verticalAlign="center">
+            <lightning:layoutItem padding="around-small">
+              <lightning:input type="date" name="customerRequestedDiscoDate" label="Customer Requested Disconnect Date" />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small">
+              <lightning:button variant="destructive" label="Initiate Disconnect" onclick="{! c.initiateDisconnect }"/>
+            </lightning:layoutItem>
+          </lightning:layout>
+        </div>
+      </aura:if>
+    </form>
+
+    <aura:if isTrue="{!v.orderInfo.Status == 'Disconnect in Progress'}">
+      <div class="heading">Disconnect Process</div>
+      <div>
+          <lightning:datatable
+                  keyField="id"
+                  data="{! v.projectTasks }"
+                  columns="{! v.columns }"
+                  hideCheckboxColumn="false"
+                  errors="{! v.errors }"
+                  draftValues="{! v.draftValues }"
+                  onsave="{! c.handleSaveEdition }"/>
+      </div>
+    </aura:if>
+    
+</aura:component>
