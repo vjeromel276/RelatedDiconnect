@@ -20,7 +20,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         if ( data ) {
             console.log( 'data', data );
             this.record = data;
-            this.sofStatus = this.record.fields.Status;
+            this.sofStatus = this.record.fields.Status.value;
             this.selectedDate = this.record.fields.Customer_Requested_Disconnect_Date__c;
             const date = JSON.parse( JSON.stringify( this.selectedDate ) );
             this.selectedDate = date.displayValue;
