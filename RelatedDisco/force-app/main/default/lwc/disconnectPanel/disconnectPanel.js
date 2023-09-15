@@ -2,6 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
 import STATUS from '@salesforce/schema/Order.Status';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 
 export default class SOFDisconnectPanel extends LightningElement {
@@ -44,32 +45,33 @@ export default class SOFDisconnectPanel extends LightningElement {
     initiateDisconnect() {
         if ( this.selectedDate == '' ) {
             const evt = new ShowToastEvent( {
-                        title: 'Success!! You DID IT!!',
-                        message: 'Vision Metrix Ticket Created',
-                        variant: 'success',
-                    } );
-                    this.dispatchEvent( evt );
-        const fields = {}
-        const outputID = this.recordId
-        fields.Id = this.recordId
-        fields.Status = 'Disconnect in Progress';
-        fields.Service_End_Reason__c = 'Draft';
-        fields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
-        // fields.Service_End_Reasons__c = 'Service No Longer Needed'
-        const recordInput = { fields };
-        
+                title: 'You must select a date',
+                message: 'There must be a customer requested disconnect date',
+                variant: 'warning',
+            } );
+            this.dispatchEvent( evt );
+        } else {
+            const fields = {}
+            const outputID = this.recordId
+            fields.Id = this.recordId
+            fields.Status = 'Disconnect in Progress';
+            fields.Service_End_Reason__c = 'Draft';
+            fields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
+            const recordInput = { fields };
+            
 
-        updateRecord( recordInput )
-            .then( result => {
-                console.log( 'result', result );
-                this.getTasks();                
-            }
-        )
-            .catch( error => {
-                console.log( 'error', error );
-            }
-        );
-
+            updateRecord( recordInput )
+                .then( result => {
+                    console.log( 'result', result );
+                    this.getTasks(); 
+                    
+                }
+            )
+                .catch( error => {
+                    console.log( 'error', error );
+                }
+            );
+        }
         
     }
     
@@ -79,6 +81,9 @@ export default class SOFDisconnectPanel extends LightningElement {
             .then( result => {
                 console.log( { result} );
                 this.taskData = result;
+                if ( this.taskData.length > 0 ) {
+                        this.isDiscoInProg = true;
+                    }
             }
         )
             .catch( error => {

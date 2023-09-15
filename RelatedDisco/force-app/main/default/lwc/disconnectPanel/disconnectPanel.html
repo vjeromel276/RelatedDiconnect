@@ -1,34 +1,39 @@
 <template>
-    <h1>Disconnect Panel</h1>
+    <lightning-card
+        title="Disconnect Panel"
+        icon-name="standard:disconnect"
+    >
+        <div class="slds-var-m-around_medium">
+            <div>
+                <lightning-input
+                    style="width: 300px;"
+                    type="date"
+                    label="Enter Customer Requested Disconnect Date"
+                    value={selectedDate}
+                    onchange={handleDateChange}
+                ></lightning-input>
 
-    <div style="height: 300px;">
-        <div>
-            <lightning-input
-                style="width: 300px;"
-                type="date"
-                label="Select a Date"
-                value={selectedDate}
-                onchange={handleDateChange}
-            ></lightning-input>
-
+            </div>
+            <lightning-button
+                variant="brand"
+                label="Disconnect"
+                onclick={initiateDisconnect}
+            ></lightning-button>
+            <template if:true={isDiscoInProg}>
+                <lightning-datatable
+                    class="slds-table slds-table_cell-buffer slds-table_bordered"
+                    key-field="id"
+                    data={taskData}
+                    show-row-number-column
+                    columns={columns}
+                    oncellchange={handleCellChange}
+                    hide-checkbox-column="true"
+                >
+                </lightning-datatable>
+            </template>
         </div>
-        <lightning-button
-            variant="brand"
-            label="Disconnect"
-            onclick={initiateDisconnect}
-        ></lightning-button>
-        <template if:true={isDiscoInProg}>
-            <lightning-datatable
-                class="slds-table slds-table_cell-buffer slds-table_bordered"
-                key-field="id"
-                data={taskData}
-                show-row-number-column
-                columns={columns}
-                oncellchange={handleCellChange}
-                hide-checkbox-column="true"
-            >
-            </lightning-datatable>
-        </template>
-    </div>
+    </lightning-card>
+
+
 
 </template>
