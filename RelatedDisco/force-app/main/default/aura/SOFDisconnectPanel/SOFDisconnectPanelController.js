@@ -12,7 +12,11 @@
         helper.getSofDetails(component);
     },
 
-    initiateDisconnect : function(component, event, helper) {
+    initiateDisconnect: function ( component, event, helper ) {
+        console.log( 'JS Controller: initiateDisconnect' );
+        console.log( component.get( 'v.recordId' ) );        
+        console.log( component.get );        
+        
         helper.initiateDisconnect(component);
     },
 

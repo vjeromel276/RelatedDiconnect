@@ -26,22 +26,37 @@
     },
 
     initiateDisconnect: function (component) {
-        var action = component.get("c.initiateDisconnect");
-        //action.setParams({ 'recordId': component.get('v.recordId'),
-        //                   'customerRequestedDiscoDate': component.get('v.customerRequestedDiscoDate')});
+        var action = component.get( "c.initiateDisconnect" );
+        console.log( 'Helper', action );
+        console.log('recordId: ', component.get('v.recordId'));
+        action.setParams( {
+            'recordId': component.get( 'v.recordId' ),
+            'customerRequestedDiscoDate': component.get( 'v.discoDate' )
+        } );
         action.setParams({ 'recordId': component.get('v.recordId')});
-        action.setCallback(this, function(response) {
+        action.setCallback( this, function ( response ) {
             var state = response.getState();
-            if (state === "SUCCESS" ) {
-                //component.set("v.orderInfo", response.getReturnValue());
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
+            if ( state === "SUCCESS" ) {
+                component.set("v.orderInfo", response.getReturnValue());
+                var toastEvent = $A.get( "e.force:showToast" );
+                toastEvent.setParams( {
                     "title": "Disconnect Initiated",
-                    "message": "The disconnect has been initiated."
-                });
+                    "message": "The disconnect has been initiated.",
+                    "type": "success"
+                } );
+                toastEvent.fire();
+            } else if ( state === "ERROR" ) {
+                var errors = response.getError();
+                console.error( errors );
+                var toastEvent = $A.get( "e.force:showToast" );
+                toastEvent.setParams( {
+                    "title": "Disconnect Initiated Failed",
+                    "message": "The disconnect has been not been initiated.",
+                    "type": "error"
+                } );
                 toastEvent.fire();
             }
-        });
+        } );        
         
         $A.enqueueAction(action);
     },

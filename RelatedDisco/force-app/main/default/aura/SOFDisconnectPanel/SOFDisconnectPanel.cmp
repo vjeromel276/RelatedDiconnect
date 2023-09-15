@@ -21,7 +21,7 @@
           <div class="heading">Initiate Disconnect Process</div>
           <lightning:layout verticalAlign="center">
             <lightning:layoutItem padding="around-small">
-              <lightning:input type="date" name="customerRequestedDiscoDate" label="Customer Requested Disconnect Date" />
+              <lightning:input aura:id="discoDate" type="date" name="customerRequestedDiscoDate" label="Customer Requested Disconnect Date" onchange="{console.log('date entered')}" />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
               <lightning:button variant="destructive" label="Initiate Disconnect" onclick="{! c.initiateDisconnect }"/>

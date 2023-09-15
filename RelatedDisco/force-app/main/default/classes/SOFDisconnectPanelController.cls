@@ -14,8 +14,13 @@ public without sharing class SOFDisconnectPanelController {
                  WHERE Service_Order_Agreement__c = :recordId 
                  AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE 
                  AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
-        
-        return tasks;
+        if(tasks.size()>0){
+            System.debug(tasks);
+            return tasks;
+        }else{
+            System.debug('No tasks found');
+            return null;
+        }
     }
 
     @AuraEnabled(cacheable=true)
