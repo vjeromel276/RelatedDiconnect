@@ -5,13 +5,16 @@ import CUST_REQ_DISCO_DATE from '@salesforce/schema/Order.Customer_Requested_Dis
 import STATUS from '@salesforce/schema/Order.Status';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
+import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
+    @api hasChildSOF= false;
     @track draftValues = [];
-    taskData = [];
+    @track taskData = [];
     @api isDiscoInProg;
     sofStatus = '';
+    @track milestoneTasks = {};
     @track record = {};
     @track selectedDate;
 
@@ -35,6 +38,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     
     connectedCallback() {
         console.log( 'recordId', this.recordId );
+        // can add multiple if statements to check for different statuses
         if( this.sofStatus == 'Disconnect in Progress' ) {
                 this.getTasks();
             }
@@ -65,7 +69,20 @@ export default class SOFDisconnectPanel extends LightningElement {
             fields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
             const recordInput = { fields };
             
-
+            if ( this.hasChildSOF ) {
+                initiateDisconnect( { recordId: outputID } )
+                    .then( result => {
+                        console.log( 'result', result );
+                        this.getTasks();
+                    }
+                    )
+                    .catch( error => {
+                        console.log( 'error', error );
+                    }
+                    );
+            }
+        
+        
             updateRecord( recordInput )
                 .then( result => {
                     console.log( 'result', result );
@@ -100,43 +117,40 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     handleCellChange( event ) {
         // Extract the changed cell's information
-        const updatedCell = { ...event.detail.draftValues[ 0 ] };
-        updatedCell = JSON.stringify(JSON.parse( JSON.stringify( updatedCell ) ))
-        this.draftValues.push( updatedCell );
-        // this.draftValues.forEach( ( item ) => {
-        //     console.log( item.originalTarget.Not_Applicable__c );
-        // } );
-    }
-
-    handleSaveCellChanges( event ) {
-        // Extract the changed cell's information
         // const updatedCell = { ...event.detail.draftValues[ 0 ] };
         // console.log( { updatedCell } );
-        // if the new value is different 
         // const fields = {}
         // fields.Id = updatedCell.Id;
         // fields.MPM4_BASE__Complete__c = updatedCell.MPM4_BASE__Complete__c;
         // fields.Not_Applicable__c = updatedCell.Not_Applicable__c;
         // fields.Resource_Name__c = updatedCell.Resource_Name__c;
-        // const recordInput = { fields };
-        // updateRecord( recordInput )
-        //     .then( result => {
-        //         console.log( 'result', result );
-        //         this.getTasks();
-        //         this.draftValues = [];
+        // this.milestoneTasks = { fields };
+        
+        // console.log( updatedCell.MPM4_BASE__Complete__c );        
+        // console.log(  updatedCell.Not_Applicable__c );
+        
+    }
 
-        //         const evt = new ShowToastEvent( {
-        //         title: 'Changes Saved',
-        //         message: 'The Changes Made Have Been Saved',
-        //         variant: 'success',
-        //     } );
-        //     this.dispatchEvent( evt );
-        //     }
-        // )
-        //     .catch( error => {
-        //         console.log( 'error', error );
-        //     }
-        // );
+    handleSaveCellChanges( event ) {
+        const recordInputs = event.detail.draftValues.slice().map( draft => {
+            // console.log( 'draft', draft);
+            const fields = { ...draft };
+            return { fields };
+        } );
+        console.log( 'recordInputs', recordInputs );
+        recordInputs.forEach( recordInput => {
+            updateRecord( recordInput )
+                .then( result => {
+                    console.log( 'result', result );
+                    this.getTasks();
+                }
+            )
+                .catch( error => {
+                    console.log( 'error', error );
+                }
+            );
+        } );
+        
     }
         
     handleDateChange( event ) {

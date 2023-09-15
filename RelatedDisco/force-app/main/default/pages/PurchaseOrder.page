@@ -1,0 +1,179 @@
+<!--
+  @description       : 
+  @author            : clabelle@everstream.net
+  @group             : 
+  @last modified on  : 12-02-2022
+  @last modified by  : clabelle@everstream.net
+-->
+<apex:page standardController="Purchase_Order_Detail__c" extensions="PurchaseOrderController" action="{!doRedirect}" lightningStylesheets="true">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <apex:form >
+        <apex:pageMessages />
+        <apex:outputPanel rendered="{!IF(approvalLockInPlace=true,true,false)}">
+            <div class="bPageTitle" style="background-color: rgb(255,183,93); text-align: center;">
+                This record has an approval lock in place, some fields may not be editable
+            </div>
+        </apex:outputPanel>
+
+        <apex:sectionHeader title="Purchase Order Edit" subtitle="{!headerTitle}" />
+        <apex:pageBlock title="Purchase Order Edit">
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!doSave}" />
+                <apex:commandButton value="Save & New" action="{!doSaveNew}" />
+                <apex:commandButton value="Cancel" action="{!doCancel}" immediate="true" html-formnovalidate="formnovalidate" />
+                <apex:commandButton value="Discard" action="{!doDiscard}" rendered="{!IF(canEditEvenIfLocked=true,true,false)}" onclick="return confirm('ಠ_ಠ  Are you really sure?  ಠ_ಠ');"
+                />
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="Information" collapsible="true">
+                <apex:inputField value="{!po.Account__c}" required="true" rendered="{!canEditFields}"/>
+                <!-- <apex:inputField value="{!po.Entity_new__c}"/>    -->
+                <apex:inputField value="{!po.Dimension_4__c}" label="Dimension 4 (Market)"  rendered="{!canEditFields}" />
+                <!-- <apex:inputField value="{!po.X1st_Level_Approval__c}"/>  -->
+                <apex:inputField value="{!po.BAN__c}"  rendered="{!canEditFields}"/>
+                <!-- <apex:inputField value="{!po.X2nd_Level_Approval__c}"/>  -->
+                <apex:inputField value="{!po.Department__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Requisitioner__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Purchase_Order_Amount__c}" required="true"  rendered="{!canEditFields}" />
+
+
+                <apex:inputField value="{!po.Ship_VIA__c}"  rendered="{!canEditFields}"/>
+
+
+                <apex:inputField value="{!po.F_O_B__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Date__c}" label="PO Date"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Recipient_Name__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Recipient_Address__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Recipient_Email__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Tax_Rate__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.S_H__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Shipping_Terms__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Expected_Delivery_Date__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.PO_Type__c}"  rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Sales_Cost_Estimate__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Others__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Comment_or_Special_Instruction__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Internal_Comments__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.OSP_ROI__c}"   rendered="{!canEditFields}"/>
+                <apex:inputField value="{!po.Service_Order_Agreement_PO__c}"  rendered="{!canEditFields}" />
+                <apex:inputCheckbox value="{!po.PO_Closed__c}"   rendered="{!canEditFields}" />
+                <apex:outputText value="" />
+                <apex:outputText value="" />
+                <apex:outputText value="" />
+                <apex:inputCheckbox value="{!po.Approved_For_Close__c}" />
+                <apex:inputField value="{!po.Authorized_by_Procurement_Manager__c}" rendered="{!IF(canEditEvenIfLocked=true,true,false)}" />
+                <apex:pageBlockSectionItem rendered="{!canEditFields}"><apex:inputField value="{!po.Authorized_by_Procurement_Manager__c}" rendered="{!IF(canEditEvenIfLocked=true,true,false)}"/></apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="1" collapsible="false"  rendered="{!canEditFields}">
+                <apex:pageBlockSection columns="1" title="Purchase Order Approvers" collapsible="true" rendered="{!IF(newPurchaseOrder=true,false,true)}">
+                    <apex:inputCheckbox value="{!po.Procurement_Approver_Override__c}" id="Procurement_Approver_Override__c" />
+                    <apex:inputField value="{!po.Manager_Approver__c}" id="Manager_Approver__c" />
+                    <apex:inputField value="{!po.Director_Approver__c}" id="Director_Approver__c" />
+                    <apex:inputField value="{!po.RVP_VP_Approver__c}" id="RVP_VP_Approver__c" />
+                    <apex:inputField value="{!po.CXO_EVP_Approver__c}" id="CXO_EVP_Approver__c" />
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+
+
+            <apex:pageBlockSection columns="1" title="Purchase Order Line" collapsible="true"  rendered="{!canEditFields}">
+                <apex:outputPanel id="lineItemPanel">
+                    <apex:pageBlockTable value="{!purOrderLines}" var="i">
+
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Item#" />
+                            </apex:facet>
+
+                            <apex:selectList size="1" value="{!i.poLine.Product_Item__c}">
+                                <apex:actionSupport event="onchange" action="{!fechItemDetails}" reRender="lineItemPanel" status="loadStatus" />
+
+                                <apex:selectOptions value="{!Items}" />
+                            </apex:selectList>
+
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Description" />
+                            </apex:facet>
+                            <apex:inputField value="{!i.poLine.Description__c}" />
+                        </apex:column>
+                      <!--  <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Description" />
+                            </apex:facet>
+                            <apex:inputField value="{!i.poLine.Purchase_Order_Product__c}" />
+                        </apex:column>-->
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Quantity" />
+                            </apex:facet>
+                            <apex:inputField value="{!i.poLine.Quantity__c}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:outputLabel value="Unit Price" />
+                            </apex:facet>
+                            <apex:inputField value="{!i.poLine.Unit_Price__c}" />
+                        </apex:column>
+                        
+
+
+                        <apex:column headerValue="Remove">
+                            <apex:actionRegion >
+                                <apex:commandLink action="{!removeNewLines}" value="Remove" reRender="lineItemPanel">
+                                    <apex:param name="index" value="{!i.index}" assignTo="{!index}" />
+                                    <apex:param name="itemId" value="{!i.poLine.Id}" assignTo="{!itemId}" />
+                                </apex:commandLink>
+                            </apex:actionRegion>
+                        </apex:column>
+
+
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+
+            <apex:commandButton action="{!addNewOrderLines}" value="Add Row" reRender="lineItemPanel" status="loadStatus">
+
+            </apex:commandButton>
+
+            <apex:actionstatus id="loadStatus" dir="RTL">
+                <apex:facet name="start">
+                    <apex:image url="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionstatus>
+
+            <!-- <apex:pageBlockSection title="Comments" collapsible="true">
+               
+                   <apex:inputField value="{!po.Comment_or_Special_Instruction__c}"/>
+              </apex:pageBlockSection> -->
+        </apex:pageBlock>
+
+    </apex:form>
+    <script>
+        $(document).ready(function () {
+            function flagFields() {
+                var flag = $("[id$=Procurement_Approver_Override__c]").is(':checked');
+                if (flag == true) {
+                    $("[id$=Manager_Approver__c]").prop("disabled", false);
+                    $("[id$=Director_Approver__c]").prop("disabled", false);
+                    $("[id$=RVP_VP_Approver__c]").prop("disabled", false);
+                    $("[id$=CXO_EVP_Approver__c]").prop("disabled", false);
+                } else {
+                    $("[id$=Manager_Approver__c]").prop("disabled", true);
+                    $("[id$=Director_Approver__c]").prop("disabled", true);
+                    $("[id$=RVP_VP_Approver__c]").prop("disabled", true);
+                    $("[id$=CXO_EVP_Approver__c]").prop("disabled", true);
+                }
+            }
+
+            flagFields();
+
+            $("[id$=Procurement_Approver_Override__c]").change(function () {
+                flagFields();
+            });
+        });
+    </script>
+</apex:page>

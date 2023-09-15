@@ -1,12 +1,11 @@
+<!-- sldsValidatorIgnore -->
+<!-- sldsValidatorIgnore -->
 <template>
     <lightning-card
         title="Disconnect Panel"
         icon-name="standard:disconnect"
     >
-    <template
-            if:false={isDiscoInProg}
-            class="slds-var-m-around_small"
-        >
+        <template if:false={isDiscoInProg}>
             <div>
                 <lightning-input
                     style="width: 300px;"
