@@ -36,6 +36,7 @@
                 <apex:inputField value="{!po.Department__c}"  rendered="{!canEditFields}" />
                 <apex:inputField value="{!po.Requisitioner__c}"  rendered="{!canEditFields}"/>
                 <apex:inputField value="{!po.Purchase_Order_Amount__c}" required="true"  rendered="{!canEditFields}" />
+                
 
 
                 <apex:inputField value="{!po.Ship_VIA__c}"  rendered="{!canEditFields}"/>
@@ -57,6 +58,7 @@
                 <apex:inputField value="{!po.Internal_Comments__c}"  rendered="{!canEditFields}" />
                 <apex:inputField value="{!po.OSP_ROI__c}"   rendered="{!canEditFields}"/>
                 <apex:inputField value="{!po.Service_Order_Agreement_PO__c}"  rendered="{!canEditFields}" />
+                <apex:inputField value="{!po.Project__c}"  rendered="{!canEditFields}" />
                 <apex:inputCheckbox value="{!po.PO_Closed__c}"   rendered="{!canEditFields}" />
                 <apex:outputText value="" />
                 <apex:outputText value="" />

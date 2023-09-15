@@ -36,7 +36,7 @@ public class PurchaseOrderController {
             newPurchaseOrder = false;
             po = [
                     select id,Authorized_by_Procurement_Manager__c,Department__c,Account__c,PO_Type__c,Purchase_Order_Number__c,S_H__c,Others__c,Purchase_Order_Approver__c,
-                            Purchase_Order_2nd_Approver__c,Purchase_Order_Amount__c, BAN__C,
+                            Purchase_Order_2nd_Approver__c,Purchase_Order_Amount__c, BAN__C, Project__c,
                             X1st_Level_Approval__c,X2nd_Level_Approval__c, Requisitioner__c,Ship_VIA__c,Date__c,F_O_B__c,Expected_Delivery_Date__c,
                             Recipient_Name__c,Recipient_Address__c,Recipient_Email__c,Tax_Rate__c,Shipping_Terms__c,
                             Procurement_Approver_Override__c,Manager_Approver__c,Director_Approver__c,RVP_VP_Approver__c,CXO_EVP_Approver__c,
