@@ -1,6 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
+import CUST_REQ_DISCO_DATE from '@salesforce/schema/Order.Customer_Requested_Disconnect_Date__c';
 import STATUS from '@salesforce/schema/Order.Status';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
@@ -9,18 +10,21 @@ export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
     @track draftValues = [];
     taskData = [];
-    @api isDiscoInProg = false;
+    @api isDiscoInProg;
     sofStatus = '';
     @track record = {};
-    @track selectedDate = '';
+    @track selectedDate;
 
-    @wire( getRecord, { recordId: '$recordId', fields: [ STATUS ] } )
+    @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
         if ( data ) {
             console.log( 'data', data );
             this.record = data;
-            this.sofStatus = this.record.fields.Status.value;
+            this.sofStatus = this.record.fields.Status;
             this.selectedDate = this.record.fields.Customer_Requested_Disconnect_Date__c;
+            const date = JSON.parse( JSON.stringify( this.selectedDate ) );
+            this.selectedDate = date.displayValue;
+            // can add multiple if statements to check for different statuses
             if( this.sofStatus == 'Disconnect in Progress' ) {
                 this.getTasks();
             }
@@ -97,9 +101,11 @@ export default class SOFDisconnectPanel extends LightningElement {
     handleCellChange( event ) {
         // Extract the changed cell's information
         const updatedCell = { ...event.detail.draftValues[ 0 ] };
+        updatedCell = JSON.stringify(JSON.parse( JSON.stringify( updatedCell ) ))
         this.draftValues.push( updatedCell );
-        // this.draftValues = [ ...this.draftValues, updatedCell ];
-        this.draftValues.forEach( ( item )=> console.log( item ));
+        // this.draftValues.forEach( ( item ) => {
+        //     console.log( item.originalTarget.Not_Applicable__c );
+        // } );
     }
 
     handleSaveCellChanges( event ) {

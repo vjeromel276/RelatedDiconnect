@@ -1,8 +1,11 @@
 <template>
-    <div class="slds-var-m-around_medium">
-        <lightning-card
-            title="Related Disconnect Panel"
-            icon-name="standard:disconnect"
+    <lightning-card
+        title="Disconnect Panel"
+        icon-name="standard:disconnect"
+    >
+    <template
+            if:false={isDiscoInProg}
+            class="slds-var-m-around_small"
         >
             <div>
                 <lightning-input
@@ -19,20 +22,20 @@
                 label="Disconnect"
                 onclick={initiateDisconnect}
             ></lightning-button>
-            <template if:true={isDiscoInProg}>
-                <lightning-datatable
-                    class="slds-table slds-table_cell-buffer slds-table_bordered"
-                    key-field="Id"
-                    data={taskData}
-                    show-row-number-column
-                    columns={columns}
-                    oncellchange={handleCellChange}
-                    errors={errors}
-                    draft-values={draftValues}
-                    hide-checkbox-column="true"
-                    onsave={handleSaveCellChanges}
-                ></lightning-datatable>
-            </template>
-        </lightning-card>
-    </div>
+        </template>
+        <template if:true={isDiscoInProg}>
+            <lightning-datatable
+                class="slds-table slds-table_cell-buffer slds-table_bordered"
+                key-field="Id"
+                data={taskData}
+                show-row-number-column="true"
+                columns={columns}
+                oncellchange={handleCellChange}
+                errors={errors}
+                draft-values={draftValues}
+                hide-checkbox-column="true"
+                onsave={handleSaveCellChanges}
+            ></lightning-datatable>
+        </template>
+    </lightning-card>
 </template>
