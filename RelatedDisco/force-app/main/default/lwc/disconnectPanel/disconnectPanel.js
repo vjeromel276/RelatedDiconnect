@@ -6,7 +6,8 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 
 export default class SOFDisconnectPanel extends LightningElement {
-    @api recordId
+    @api recordId;
+    @track draftValues = [];
     taskData = [];
     @api isDiscoInProg = false;
     sofStatus = '';
@@ -19,6 +20,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             console.log( 'data', data );
             this.record = data;
             this.sofStatus = this.record.fields.Status.value;
+            this.selectedDate = this.record.fields.Customer_Requested_Disconnect_Date__c;
             if( this.sofStatus == 'Disconnect in Progress' ) {
                 this.getTasks();
             }
@@ -93,18 +95,44 @@ export default class SOFDisconnectPanel extends LightningElement {
     }
 
     handleCellChange( event ) {
-         // Extract the changed cell's information
-        const { fieldName, value } = event.detail;
-
-    // Log the changed field name and its new value
-        console.log( `Field '${ fieldName }' changed to: ${ value }` );
-    
-    // You can access the old value as well, if needed
-        const { rowKeyValue, oldValue } = event.detail;
-        console.log( `Old value for field '${ fieldName }' with key '${ rowKeyValue }': ${ oldValue }` );
-    
+        // Extract the changed cell's information
+        const updatedCell = { ...event.detail.draftValues[ 0 ] };
+        this.draftValues.push( updatedCell );
+        // this.draftValues = [ ...this.draftValues, updatedCell ];
+        this.draftValues.forEach( ( item )=> console.log( item ));
     }
 
+    handleSaveCellChanges( event ) {
+        // Extract the changed cell's information
+        // const updatedCell = { ...event.detail.draftValues[ 0 ] };
+        // console.log( { updatedCell } );
+        // if the new value is different 
+        // const fields = {}
+        // fields.Id = updatedCell.Id;
+        // fields.MPM4_BASE__Complete__c = updatedCell.MPM4_BASE__Complete__c;
+        // fields.Not_Applicable__c = updatedCell.Not_Applicable__c;
+        // fields.Resource_Name__c = updatedCell.Resource_Name__c;
+        // const recordInput = { fields };
+        // updateRecord( recordInput )
+        //     .then( result => {
+        //         console.log( 'result', result );
+        //         this.getTasks();
+        //         this.draftValues = [];
+
+        //         const evt = new ShowToastEvent( {
+        //         title: 'Changes Saved',
+        //         message: 'The Changes Made Have Been Saved',
+        //         variant: 'success',
+        //     } );
+        //     this.dispatchEvent( evt );
+        //     }
+        // )
+        //     .catch( error => {
+        //         console.log( 'error', error );
+        //     }
+        // );
+    }
+        
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
