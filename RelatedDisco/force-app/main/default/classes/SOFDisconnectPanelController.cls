@@ -1,43 +1,53 @@
 /**
- * @description       : 
+ * @description       :
  * @author            : clabelle@everstream.net
- * @group             : 
+ * @group             :
  * @last modified on  : 08-11-2023
  * @last modified by  : clabelle@everstream.net
-**/
-public without sharing class SOFDisconnectPanelController {
-    @AuraEnabled(cacheable=true)
-    public static List<MPM4_BASE__Milestone1_Task__c> getTasks(String recordId) {
+ **/
+public without sharing class SOFDisconnectPanelController{
+    @AuraEnabled
+    public static List<MPM4_BASE__Milestone1_Task__c> getTasks(String recordId){
         List<MPM4_BASE__Milestone1_Task__c> tasks = new List<MPM4_BASE__Milestone1_Task__c>();
-        tasks = [SELECT ID, Name, Milestone_Name__c, MPM4_BASE__Complete__c, Not_Applicable__c, Resource_Name__c 
-                 FROM MPM4_BASE__Milestone1_Task__c 
-                 WHERE Service_Order_Agreement__c = :recordId 
-                 AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE 
-                 AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
-        if(tasks.size()>0){
+        tasks = [SELECT ID, Name, Milestone_Name__c, MPM4_BASE__Complete__c, Not_Applicable__c, Resource_Name__c
+                 FROM MPM4_BASE__Milestone1_Task__c
+                 WHERE Service_Order_Agreement__c = :recordId AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
+        if (tasks.size() > 0){
             System.debug(tasks);
             return tasks;
-        }else{
+        } else{
             System.debug('No tasks found');
             return null;
         }
     }
 
-    @AuraEnabled(cacheable=true)
-    public static Order getSofDetails(String recordId) {
-        return [SELECT ID, OrderNumber, Status FROM Order WHERE Id = :recordId];
+    @AuraEnabled
+    public static void updateMilestone1Tasks(List<MPM4_BASE__Milestone1_Task__c> tasks){
+        System.debug('updateMilestone1Tasks');
+        System.debug(tasks);
+        if (tasks.size() > 0){
+            update tasks;
+        }
     }
 
-    @AuraEnabled(cacheable=true)
-    public static Boolean initiateDisconnect(String recordId) {
+    @AuraEnabled
+    public static Order getSofDetails(String recordId){
+        return [SELECT ID, OrderNumber, Status
+                FROM Order
+                WHERE Id = :recordId];
+    }
+
+    @AuraEnabled
+    public static Boolean initiateDisconnect(String recordId){
         //public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
-            System.debug('initiateDisconnect');
+        System.debug('initiateDisconnect');
         Boolean isSuccess = false;
-        
+
         update new Order(Id = recordId, Status = 'Disconnect in Progress', Reported_Disconnect_Date__c = System.today());
         //update new Order(Id = recordId, Status = 'Disconnect in Progress', Reported_Disconnect_Date__c = System.today(), Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate);
         isSuccess = true;
 
         return isSuccess;
     }
+
 }

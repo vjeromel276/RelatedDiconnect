@@ -6,16 +6,18 @@ import STATUS from '@salesforce/schema/Order.Status';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
+import updateMilestone1Tasks from '@salesforce/apex/SOFDisconnectPanelController.updateMilestone1Tasks';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
     @api hasChildSOF= false;
-    @track draftValues = [];
+    draftValues = [];
     @track taskData = [];
     @api isDiscoInProg;
     sofStatus = '';
     @track milestoneTasks = {};
     @track record = {};
+    @track taskRecords = {};
     @track selectedDate;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
@@ -72,25 +74,25 @@ export default class SOFDisconnectPanel extends LightningElement {
             if ( this.hasChildSOF ) {
                 initiateDisconnect( { recordId: outputID } )
                     .then( result => {
-                        console.log( 'result', result );
+                        console.log( 'initiateDisconnect result', result );
                         this.getTasks();
                     }
                     )
                     .catch( error => {
-                        console.log( 'error', error );
+                        console.log( 'initiateDisconnect error', error );
                     }
                     );
             }        
         
             updateRecord( recordInput )
                 .then( result => {
-                    console.log( 'result', result );
+                    console.log( 'updateRecord result', result );
                     this.getTasks(); 
                     
                 }
             )
                 .catch( error => {
-                    console.log( 'error', error );
+                    console.log( 'updateRecord error', error );
                 }
             );
         }
@@ -101,7 +103,8 @@ export default class SOFDisconnectPanel extends LightningElement {
         const outputID = this.recordId
         getTasks( { recordId: outputID } )
             .then( result => {
-                console.log( { result} );
+                console.log( 'getTasks ' );
+                console.log( { result } );
                 this.taskData = result;
                 if ( this.taskData.length > 0 ) {
                         this.isDiscoInProg = true;
@@ -109,38 +112,35 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
         )
             .catch( error => {
-                console.log( 'error', error );
+                console.log( 'getTasks error', error );
             }
         );
     }
 
-    handleCellChange( event ) {
-       
+    onCellChange( event ) {
+        console.log( 'event.detail.draftValues', event.detail.draftValues[0] );
+        this.draftValues = event.detail.draftValues;
+         // Loop through each draft value
+        this.draftValues.forEach( draft => {
+            // Find the index of the task in the taskData array that has the same Id as the draft
+            let index = this.taskData.findIndex( task => task.Id === draft.Id );
+
+            // If a task with the same Id is found, update it with the draft values
+            if ( index !== -1 ) {
+                this.taskData[ index ] = { ...this.taskData[ index ], ...draft };
+            }
+        } );
+        // console.log( 'this.taskData', this.taskData );
+        this.draftValues = [];
+        this.taskData = [ ...this.taskData ];        
         
     }
-
-    handleSaveCellChanges( event ) {
-        // const recordInputs = ;
-        event.detail.draftValues.slice().map( draft => {
-            // console.log( 'draft', draft);
-            const fields = { ...draft };
-            return { fields };
-        } ).forEach( recordInput => {
-            updateRecord( recordInput )
-                .then( result => {
-                    console.log( 'result', result );
-                    // this.taskData = result;
-                    return this.getTasks();
-                }
-            )
-                .catch( error => {
-                    console.log( 'error', error );
-                }
-                    
-            );
-            
-        } );
-        
+    
+    updateTasks( event ) {
+        event.preventDefault();
+        const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
+        console.log( 'taskRecords', records );
+        console.log( 'records', records );       
     }
         
     handleDateChange( event ) {

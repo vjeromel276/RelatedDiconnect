@@ -23,20 +23,24 @@
             ></lightning-button>
         </template>
         <template if:true={isDiscoInProg}>
-            <lightning-datatable
-                class="slds-table slds-table_cell-buffer slds-table_bordered"
-                key-field="Id"
-                data={taskData}
-                show-row-number-column="true"
-                columns={columns}
-                
-                onrowaction={handleRowAction}
-                errors={errors}
-                draft-values={draftValues}
-                hide-checkbox-column="true"
-                oncancel={handleCancel}
-                onsave={handleSaveCellChanges}
-            ></lightning-datatable>
+            <div>
+                <lightning-datatable
+                    key-field="Id"
+                    data={taskData}
+                    show-row-number-column="true"
+                    columns={columns}
+                    oncellchange={onCellChange}
+                    errors={errors}
+                    draft-values={draftValues}
+                    hide-checkbox-column="true"
+                    onsave={updateTasks}
+                ></lightning-datatable>
+            </div>
+            <lightning-button
+                variant="brand"
+                label="Update Tasks"
+                onclick={updateTasks}
+            ></lightning-button>
         </template>
     </lightning-card>
 </template>
