@@ -2,50 +2,78 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <lightning-card
-        title="Disconnect Panel"
-        icon-name="standard:disconnect"
+        title="Disconnection Task List"
     >
-        <template if:false={isDiscoInProg}>
-            <div>
-                <lightning-input
-                    style="width: 300px;"
-                    type="date"
-                    label="Enter Customer Requested Disconnect Date"
-                    value={selectedDate}
-                    onchange={handleDateChange}
-                ></lightning-input>
-
-            </div>
-            <lightning-button
-                variant="brand"
-                label="Disconnect"
-                onclick={initiateDisconnect}
-            ></lightning-button>
+        <lightning-spinner
+            if:true={isLoading}
+            alternative-text="Loading"
+            size="large"
+        ></lightning-spinner>
+        <template if:false={isLoading}>
+            <template if:false={isDiscoInProg}>
+                <lightning-card>
+                    <lightning-input
+                        style="width: 300px;"
+                        type="date"
+                        label="Enter Customer Requested Disconnect Date"
+                        value={selectedDate}
+                        onchange={handleDateChange}
+                    ></lightning-input>
+                </lightning-card>
+                <lightning-button
+                    variant="brand"
+                    label="Disconnect"
+                    onclick={initiateDisconnect}
+                ></lightning-button>
+            </template>
         </template>
         <template if:true={isDiscoInProg}>
-            <div>
-                <lightning-datatable
-                    key-field="Id"
-                    data={taskData}
-                    show-row-number-column="true"
-                    columns={columns}
-                    oncellchange={onCellChange}
-                    errors={errors}
-                    draft-values={draftValues}
-                    hide-checkbox-column="true"
-                ></lightning-datatable>
-            </div><template if:true={hasTasks}>
+            <template if:true={isLoading}>
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="large"
+                ></lightning-spinner>
+            </template>
+            <template if:false={isLoading}>
+                <lightning-tile title="Customer Selected Disconnect Date">
+                    <lightning-formatted-date-time
+                        value={selectedDate}
+                        year="numeric"
+                        month="long"
+                        day="2-digit"
+                    ></lightning-formatted-date-time>
+                </lightning-tile>
+                <lightning-card>
+
+                    <lightning-datatable
+                        key-field="Id"
+                        data={taskData}
+                        show-row-number-column="true"
+                        columns={columns}
+                        oncellchange={onCellChange}
+                        errors={errors}
+                        draft-values={draftValues}
+                        hide-checkbox-column="true"
+                    ></lightning-datatable>
+                </lightning-card>
+            </template>
+            <template if:true={hasTasks}>
+
                 <lightning-button
                     variant="brand"
                     label="Update Tasks"
                     onclick={updateTasks}
                 ></lightning-button>
+
                 <lightning-button
                     variant="brand"
                     label="Cancel Update"
                     onclick={handleCancel}
                 ></lightning-button>
+
             </template>
+
         </template>
+
     </lightning-card>
 </template>

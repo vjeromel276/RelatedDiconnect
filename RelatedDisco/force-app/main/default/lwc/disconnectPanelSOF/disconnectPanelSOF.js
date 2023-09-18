@@ -20,10 +20,13 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track taskRecords = {};
     @track selectedDate;
     @api hasTasks = false;
+    @track isLoading = false;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
+        this.isLoading = true;
         if ( data ) {
+            this.isLoading = false;
             console.log( 'data', data );
             this.record = data;
             this.sofStatus = this.record.fields.Status.value;
@@ -56,7 +59,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     ];
 
     initiateDisconnect() {
-        if ( this.selectedDate == '' ) {
+        if ( this.selectedDate == ''|| this.selectedDate == null ) {
             const evt = new ShowToastEvent( {
                 title: 'You must select a date',
                 message: 'There must be a customer requested disconnect date',
@@ -64,6 +67,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
             this.dispatchEvent( evt );
         } else {
+            this.isLoading = true;
             const fields = {}
             const outputID = this.recordId
             fields.Id = this.recordId
@@ -83,14 +87,21 @@ export default class SOFDisconnectPanel extends LightningElement {
                             variant: 'brand',
                         } );
                         this.dispatchEvent( evt );
-                    }
-                    )
+                        this.isLoading = false;
+                    } )
                     .catch( error => {
                         console.log( 'initiateDisconnect error', error );
-                    }
-                    );
-            } else {        
-                updateRecord( recordInput )
+                        const evt = new ShowToastEvent( {
+                            title: 'Record Update Failed',
+                            message: 'The record has not been updated.',
+                            variant: 'error',
+                        } );
+                        this.dispatchEvent( evt );
+                        this.isLoading = false;
+                    } );
+            } else {
+                this.isLoading = true;     
+                updateRecord( recordInput )                    
                     .then( result => {
                         console.log( 'updateRecord result', result );
                         this.getTasks();
@@ -100,6 +111,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                             variant: 'brand',
                         } );
                         this.dispatchEvent( evt );
+                        this.isLoading = false;
                     }
                     )
                     .catch( error => {
@@ -110,6 +122,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                             variant: 'error',
                         } );
                         this.dispatchEvent( evt );
+                        this.isLoading = false;
                     }
                     );
             }
@@ -118,6 +131,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     }
     
     getTasks() {
+        this.isLoading = true;
         const outputID = this.recordId
         getTasks( { recordId: outputID } )
             .then( result => {
@@ -132,6 +146,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                         variant: 'warning',
                     } );
                     this.dispatchEvent( evt );
+                    this.isLoading = false;
                     }
             }
         )
@@ -142,7 +157,8 @@ export default class SOFDisconnectPanel extends LightningElement {
                         message: 'The disconnect process has not been started.',
                         variant: 'error',
                     } );
-                    this.dispatchEvent( evt );
+                this.dispatchEvent( evt );
+                this.isLoading = false;
             }
         );
     }
@@ -171,30 +187,33 @@ export default class SOFDisconnectPanel extends LightningElement {
         event.preventDefault();
         const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
         console.log( 'taskRecords', records );
+        this.isLoading = true;
         updateMilestone1Tasks( { tasks: records } )
             .then( result => {
                 console.log( 'updateMilestone1Tasks result', result );
                 this.getTasks();
+                this.hasTasks = false;
                 const evt = new ShowToastEvent( {
-                        title: 'Milestone1 Tasks Updated',
-                        message: 'The record has been updated.',
-                        variant: 'brand',
-                    } );
-                    this.dispatchEvent( evt );
-                
-            }
-        )
+                    title: 'Milestone1 Tasks Updated',
+                    message: 'The record has been updated.',
+                    variant: 'brand',
+                } );
+                this.dispatchEvent( evt );
+                this.isLoading = false;
+            } )
             .catch( error => {
                 console.log( 'updateMilestone1Tasks error', error );
+                this.hasTasks = false;
                 const evt = new ShowToastEvent( {
-                        title: 'Milestone1 Tasks Update Failed',
-                        message: 'The record has not been updated.',
-                        variant: 'error',
-                    } );
-                    this.dispatchEvent( evt );
-            }
-        );
-        
+                    title: 'Milestone1 Tasks Update Failed',
+                    message: 'The record has not been updated. Try again.',
+                    variant: 'error',
+                } );
+                this.dispatchEvent( evt );                
+                this.getTasks();
+                this.isLoading = false;
+            } );
+        // End of updateMilestone1Tasks
     }
 
     handleCancel(event) {
@@ -202,6 +221,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.getTasks();
         this.draftValues = [];
         this.hasTasks = false;
+        this.isLoading = false;
     }
     
     handleDateChange( event ) {
