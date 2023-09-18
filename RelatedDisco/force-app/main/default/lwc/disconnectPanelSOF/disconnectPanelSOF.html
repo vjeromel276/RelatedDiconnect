@@ -33,14 +33,19 @@
                     errors={errors}
                     draft-values={draftValues}
                     hide-checkbox-column="true"
-                    onsave={updateTasks}
                 ></lightning-datatable>
-            </div>
-            <lightning-button
-                variant="brand"
-                label="Update Tasks"
-                onclick={updateTasks}
-            ></lightning-button>
+            </div><template if:true={hasTasks}>
+                <lightning-button
+                    variant="brand"
+                    label="Update Tasks"
+                    onclick={updateTasks}
+                ></lightning-button>
+                <lightning-button
+                    variant="brand"
+                    label="Cancel Update"
+                    onclick={handleCancel}
+                ></lightning-button>
+            </template>
         </template>
     </lightning-card>
 </template>
