@@ -1,9 +1,7 @@
 <!-- sldsValidatorIgnore -->
 <!-- sldsValidatorIgnore -->
 <template>
-    <lightning-card
-        title="Disconnection Task List"
-    >
+    <lightning-card title="Disconnection Task List">
         <lightning-spinner
             if:true={isLoading}
             alternative-text="Loading"
@@ -60,12 +58,14 @@
             <template if:true={hasTasks}>
 
                 <lightning-button
+                    class="slds-var-m-around_x-small"
                     variant="brand"
                     label="Update Tasks"
                     onclick={updateTasks}
                 ></lightning-button>
 
                 <lightning-button
+                    class="slds-var-m-around_x-small"
                     variant="brand"
                     label="Cancel Update"
                     onclick={handleCancel}

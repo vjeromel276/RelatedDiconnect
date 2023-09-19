@@ -175,45 +175,50 @@ export default class SOFDisconnectPanel extends LightningElement {
             if ( index !== -1 ) {
                 this.taskData[ index ] = { ...this.taskData[ index ], ...draft };
             }
+            this.isLoading = true;
         } );
+            
         // console.log( 'this.taskData', this.taskData );
         this.draftValues = [];
         this.taskData = [ ...this.taskData ];
         this.hasTasks = true;
-        
+        this.isLoading = false;
     }
     
     updateTasks( event ) {
         event.preventDefault();
-        const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
-        console.log( 'taskRecords', records );
-        this.isLoading = true;
-        updateMilestone1Tasks( { tasks: records } )
-            .then( result => {
-                console.log( 'updateMilestone1Tasks result', result );
-                this.getTasks();
-                this.hasTasks = false;
-                const evt = new ShowToastEvent( {
-                    title: 'Milestone1 Tasks Updated',
-                    message: 'The record has been updated.',
-                    variant: 'brand',
+        
+        setTimeout( () => {
+        
+            const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
+            console.log( 'taskRecords', records );
+            this.isLoading = true;
+            updateMilestone1Tasks( { tasks: records } )
+                .then( result => {
+                    console.log( 'updateMilestone1Tasks result', result );
+                    this.getTasks();
+                    this.hasTasks = false;
+                    const evt = new ShowToastEvent( {
+                        title: 'Milestone1 Tasks Updated',
+                        message: 'The record has been updated.',
+                        variant: 'brand',
+                    } );
+                    this.dispatchEvent( evt );
+                    this.isLoading = false;
+                } )
+                .catch( error => {
+                    console.log( 'updateMilestone1Tasks error', error );
+                    this.hasTasks = false;
+                    const evt = new ShowToastEvent( {
+                        title: 'Milestone1 Tasks Update Failed',
+                        message: 'The record has not been updated. Try again.',
+                        variant: 'error',
+                    } );
+                    this.dispatchEvent( evt );
+                    this.getTasks();
+                    this.isLoading = false;
                 } );
-                this.dispatchEvent( evt );
-                this.isLoading = false;
-            } )
-            .catch( error => {
-                console.log( 'updateMilestone1Tasks error', error );
-                this.hasTasks = false;
-                const evt = new ShowToastEvent( {
-                    title: 'Milestone1 Tasks Update Failed',
-                    message: 'The record has not been updated. Try again.',
-                    variant: 'error',
-                } );
-                this.dispatchEvent( evt );                
-                this.getTasks();
-                this.isLoading = false;
-            } );
-        // End of updateMilestone1Tasks
+        }, 100 );
     }
 
     handleCancel(event) {
