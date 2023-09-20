@@ -46,8 +46,8 @@ export default class SOFDisconnectPanel extends LightningElement {
         console.log( 'recordId', this.recordId );
         // can add multiple if statements to check for different statuses
         if( this.sofStatus == 'Disconnect in Progress' ) {
-                this.getTasks();
-            }
+            this.getTasks();
+        }       
     }
 
     columns = [
@@ -80,6 +80,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             const recordInput = { fields };
             
             if ( this.hasChildSOF ) {
+                console.log( 'hasChildSOF', this.hasChildSOF );
                 this.isLoading = true;
                 setTimeout( () => {
                     initiateDisconnect( { recordId: outputID } )
@@ -106,8 +107,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                         } );
                 }, 5000 );
             } else {
-                this.isLoading = true;
-                
+                this.isLoading = true;                
                     updateRecord( recordInput )
                         .then( result => {
                             setTimeout( () => {
@@ -131,8 +131,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                             } );
                             this.dispatchEvent( evt );
                             this.isLoading = false;
-                        } );
-                
+                        } );                
             }
         }
     }
