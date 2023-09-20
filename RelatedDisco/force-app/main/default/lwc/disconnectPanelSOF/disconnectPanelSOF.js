@@ -59,7 +59,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     ];
 
     initiateDisconnect() {
-        if ( this.selectedDate == ''|| this.selectedDate == null ) {
+        if ( this.selectedDate == '' || this.selectedDate == null ) {
             const evt = new ShowToastEvent( {
                 title: 'You must select a date',
                 message: 'There must be a customer requested disconnect date',
@@ -68,66 +68,73 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.dispatchEvent( evt );
         } else {
             this.isLoading = true;
-            const fields = {}
-            const outputID = this.recordId
-            fields.Id = this.recordId
+            const fields = {};
+            const outputID = this.recordId;
+            fields.Id = this.recordId;
             fields.Status = 'Disconnect in Progress';
             fields.Service_End_Reason__c = 'Draft';
-            fields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
+            // Format the selected date to 'YYYY-MM-DD'
+            let date = new Date( this.selectedDate );
+            let formattedDate = date.toISOString().split( 'T' )[ 0 ];
+            fields.Customer_Requested_Disconnect_Date__c = formattedDate;
             const recordInput = { fields };
             
             if ( this.hasChildSOF ) {
-                initiateDisconnect( { recordId: outputID } )
-                    .then( result => {
-                        console.log( 'initiateDisconnect result', result );
-                        this.getTasks();
-                        const evt = new ShowToastEvent( {
-                            title: 'Record Updated',
-                            message: 'The record has been updated.',
-                            variant: 'brand',
+                this.isLoading = true;
+                setTimeout( () => {
+                    initiateDisconnect( { recordId: outputID } )
+                        .then( result => {
+                            console.log( 'initiateDisconnect result', result );
+                            this.getTasks();
+                            const evt = new ShowToastEvent( {
+                                title: 'Record Updated',
+                                message: 'The record has been updated.',
+                                variant: 'brand',
+                            } );
+                            this.dispatchEvent( evt );
+                            this.isLoading = false;
+                        } )
+                        .catch( error => {
+                            console.log( 'initiateDisconnect error', error );
+                            const evt = new ShowToastEvent( {
+                                title: 'Record Update Failed',
+                                message: 'The record has not been updated.',
+                                variant: 'error',
+                            } );
+                            this.dispatchEvent( evt );
+                            this.isLoading = false;
                         } );
-                        this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    } )
-                    .catch( error => {
-                        console.log( 'initiateDisconnect error', error );
-                        const evt = new ShowToastEvent( {
-                            title: 'Record Update Failed',
-                            message: 'The record has not been updated.',
-                            variant: 'error',
-                        } );
-                        this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    } );
+                }, 5000 );
             } else {
-                this.isLoading = true;     
-                updateRecord( recordInput )                    
-                    .then( result => {
-                        console.log( 'updateRecord result', result );
-                        this.getTasks();
-                        const evt = new ShowToastEvent( {
-                            title: 'Record Updated',
-                            message: 'The record has been updated.',
-                            variant: 'brand',
+                this.isLoading = true;
+                
+                    updateRecord( recordInput )
+                        .then( result => {
+                            setTimeout( () => {
+                                console.log( 'updateRecord result', result );
+                                this.getTasks();
+                                const evt = new ShowToastEvent( {
+                                    title: 'Record Updated',
+                                    message: 'The record has been updated.',
+                                    variant: 'brand',
+                                } );
+                                this.dispatchEvent( evt );
+                                this.isLoading = false;
+                            }, 5000 );
+                        } )
+                        .catch( error => {
+                            console.log( 'updateRecord error', error );
+                            const evt = new ShowToastEvent( {
+                                title: 'Record Update Failed',
+                                message: 'The record has not been updated.',
+                                variant: 'error',
+                            } );
+                            this.dispatchEvent( evt );
+                            this.isLoading = false;
                         } );
-                        this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    }
-                    )
-                    .catch( error => {
-                        console.log( 'updateRecord error', error );
-                        const evt = new ShowToastEvent( {
-                            title: 'Record Update Failed',
-                            message: 'The record has not been updated.',
-                            variant: 'error',
-                        } );
-                        this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    }
-                    );
+                
             }
         }
-        
     }
     
     getTasks() {
