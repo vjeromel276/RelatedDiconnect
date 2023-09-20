@@ -21,7 +21,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track selectedDate;
     @api hasTasks = false;
     @track isLoading = false;
-    @track noProjectFound = false;
+    @track noProjectFound;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -146,16 +146,20 @@ export default class SOFDisconnectPanel extends LightningElement {
                 console.log( 'getTasks ' );
                 console.log( { result } );
                 this.taskData = result;
-                if ( this.taskData.length > 0 ) {
-                    this.isDiscoInProg = true;
-                    const evt = new ShowToastEvent( {
-                        title: 'Disconnect Process Started',
-                        message: 'The disconnect process has been started.',
-                        variant: 'warning',
-                    } );
-                    this.dispatchEvent( evt );
-                    this.isLoading = false;
-                }
+                    if ( this.taskData.length > 0 ) {
+                        this.isDiscoInProg = true;
+                        const evt = new ShowToastEvent( {
+                            title: 'Disconnect Process Started',
+                            message: 'The disconnect process has been started.',
+                            variant: 'warning',
+                        } );
+                        this.dispatchEvent( evt );
+                        this.isLoading = false;
+                    } else { 
+                        this.hasTasks = false;
+                        console.log( 'noProjectFound', this.noProjectFound );
+                        this.isLoading = false;
+                    }
                 }, 3000 );
             }
         )
