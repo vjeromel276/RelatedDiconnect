@@ -21,7 +21,6 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track selectedDate;
     @api hasTasks = false;
     @track isLoading = false;
-    @track noProjectFound;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -47,8 +46,8 @@ export default class SOFDisconnectPanel extends LightningElement {
         console.log( 'recordId', this.recordId );
         // can add multiple if statements to check for different statuses
         if( this.sofStatus == 'Disconnect in Progress' ) {
-            this.getTasks();
-        }       
+                this.getTasks();
+            }
     }
 
     columns = [
@@ -81,7 +80,6 @@ export default class SOFDisconnectPanel extends LightningElement {
             const recordInput = { fields };
             
             if ( this.hasChildSOF ) {
-                console.log( 'hasChildSOF', this.hasChildSOF );
                 this.isLoading = true;
                 setTimeout( () => {
                     initiateDisconnect( { recordId: outputID } )
@@ -108,7 +106,8 @@ export default class SOFDisconnectPanel extends LightningElement {
                         } );
                 }, 5000 );
             } else {
-                this.isLoading = true;                
+                this.isLoading = true;
+                
                     updateRecord( recordInput )
                         .then( result => {
                             setTimeout( () => {
@@ -132,7 +131,8 @@ export default class SOFDisconnectPanel extends LightningElement {
                             } );
                             this.dispatchEvent( evt );
                             this.isLoading = false;
-                        } );                
+                        } );
+                
             }
         }
     }
@@ -142,29 +142,22 @@ export default class SOFDisconnectPanel extends LightningElement {
         const outputID = this.recordId
         getTasks( { recordId: outputID } )
             .then( result => {
-                setTimeout( () => { 
                 console.log( 'getTasks ' );
                 console.log( { result } );
                 this.taskData = result;
-                    if ( this.taskData.length > 0 ) {
-                        this.isDiscoInProg = true;
-                        const evt = new ShowToastEvent( {
-                            title: 'Disconnect Process Started',
-                            message: 'The disconnect process has been started.',
-                            variant: 'warning',
-                        } );
-                        this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    } else { 
-                        this.hasTasks = false;
-                        console.log( 'noProjectFound', this.noProjectFound );
-                        this.isLoading = false;
+                if ( this.taskData.length > 0 ) {
+                    this.isDiscoInProg = true;
+                    const evt = new ShowToastEvent( {
+                        title: 'Disconnect Process Started',
+                        message: 'The disconnect process has been started.',
+                        variant: 'warning',
+                    } );
+                    this.dispatchEvent( evt );
+                    this.isLoading = false;
                     }
-                }, 3000 );
             }
         )
             .catch( error => {
-                // 
                 console.log( 'getTasks error', error );
                 const evt = new ShowToastEvent( {
                         title: 'Unable To Start Disconnect Process',
@@ -173,7 +166,6 @@ export default class SOFDisconnectPanel extends LightningElement {
                     } );
                 this.dispatchEvent( evt );
                 this.isLoading = false;
-                this.noProjectFound = true;
             }
         );
     }
@@ -201,13 +193,15 @@ export default class SOFDisconnectPanel extends LightningElement {
     }
     
     updateTasks( event ) {
-        event.preventDefault();      
+        event.preventDefault();
+        
+        setTimeout( () => {
+        
             const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
             console.log( 'taskRecords', records );
             this.isLoading = true;
             updateMilestone1Tasks( { tasks: records } )
                 .then( result => {
-                    setTimeout( () => {
                     console.log( 'updateMilestone1Tasks result', result );
                     this.getTasks();
                     this.hasTasks = false;
@@ -217,11 +211,9 @@ export default class SOFDisconnectPanel extends LightningElement {
                         variant: 'brand',
                     } );
                     this.dispatchEvent( evt );
-                        this.isLoading = false;
-                    }, 3000 );
+                    this.isLoading = false;
                 } )
                 .catch( error => {
-                    
                     console.log( 'updateMilestone1Tasks error', error );
                     this.hasTasks = false;
                     const evt = new ShowToastEvent( {
@@ -233,6 +225,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                     this.getTasks();
                     this.isLoading = false;
                 } );
+        }, 100 );
     }
 
     handleCancel(event) {

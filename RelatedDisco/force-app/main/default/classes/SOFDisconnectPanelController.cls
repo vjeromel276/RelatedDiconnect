@@ -13,10 +13,6 @@ public without sharing class SOFDisconnectPanelController{
                  FROM MPM4_BASE__Milestone1_Task__c
                  WHERE Service_Order_Agreement__c = :recordId AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
 
-        // Fire the Platform Event when the process is finished
-        Long_Running_Process_Finished__e event = new Long_Running_Process_Finished__e();
-        event.RecordId__c = recordId;
-        EventBus.publish(event) ;
 
         if (tasks.size() > 0){
             System.debug(tasks);
