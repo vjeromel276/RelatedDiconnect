@@ -21,6 +21,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track selectedDate;
     @api hasTasks = false;
     @track isLoading = false;
+    @track tasksFetchError = false;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -42,13 +43,13 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
     }
     
-    connectedCallback() {
-        console.log( 'recordId', this.recordId );
-        // can add multiple if statements to check for different statuses
-        if( this.sofStatus == 'Disconnect in Progress' ) {
-                this.getTasks();
-            }
-    }
+    // connectedCallback() {
+    //     console.log( 'recordId', this.recordId );
+    //     // can add multiple if statements to check for different statuses
+    //     if( this.sofStatus == 'Disconnect in Progress' ) {
+    //             this.getTasks();
+    //         }
+    // }
 
     columns = [
         { label: 'Milestone Name', fieldName: 'Milestone_Name__c', type: 'text' },
@@ -144,8 +145,8 @@ export default class SOFDisconnectPanel extends LightningElement {
             .then( result => {
                 console.log( 'getTasks ' );
                 console.log( { result } );
-                this.taskData = result;
-                if ( this.taskData.length > 0 ) {
+                if ( result !=null ) {
+                    this.taskData = result;
                     this.isDiscoInProg = true;
                     const evt = new ShowToastEvent( {
                         title: 'Disconnect Process Started',
@@ -153,10 +154,15 @@ export default class SOFDisconnectPanel extends LightningElement {
                         variant: 'warning',
                     } );
                     this.dispatchEvent( evt );
-                    this.isLoading = false;
-                    }
+                    this.tasksFetchError = false;
+                } else {
+                    this.isDiscoInProg = true;
+                    this.tasksFetchError = true;
+                    
+                }
+                this.isLoading = false;
             }
-        )
+            )
             .catch( error => {
                 console.log( 'getTasks error', error );
                 const evt = new ShowToastEvent( {
