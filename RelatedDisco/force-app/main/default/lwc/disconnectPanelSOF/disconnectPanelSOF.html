@@ -33,27 +33,23 @@
                 ></lightning-spinner>
             </template>
             <template if:false={isLoading}>
-                <lightning-tile title="Customer Selected Disconnect Date">
-                    <lightning-formatted-date-time
-                        value={selectedDate}
-                        year="numeric"
-                        month="long"
-                        day="2-digit"
-                    ></lightning-formatted-date-time>
-                </lightning-tile>
-                <lightning-card>
-
-                    <lightning-datatable
-                        key-field="Id"
-                        data={taskData}
-                        show-row-number-column="true"
-                        columns={columns}
-                        oncellchange={onCellChange}
-                        errors={errors}
-                        draft-values={draftValues}
-                        hide-checkbox-column="true"
-                    ></lightning-datatable>
-                </lightning-card>
+                <template if:true={noProjectFound}>
+                    No Project Found
+                </template>
+                <template if:false={noProjectFound}>
+                    <lightning-card>
+                        <lightning-datatable
+                            key-field="Id"
+                            data={taskData}
+                            show-row-number-column="true"
+                            columns={columns}
+                            oncellchange={onCellChange}
+                            errors={errors}
+                            draft-values={draftValues}
+                            hide-checkbox-column="true"
+                        ></lightning-datatable>
+                    </lightning-card>
+                </template>
             </template>
             <template if:true={hasTasks}>
 

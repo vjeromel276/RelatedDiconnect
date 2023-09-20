@@ -21,6 +21,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track selectedDate;
     @api hasTasks = false;
     @track isLoading = false;
+    @track noProjectFound = false;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -141,6 +142,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         const outputID = this.recordId
         getTasks( { recordId: outputID } )
             .then( result => {
+                setTimeout( () => { 
                 console.log( 'getTasks ' );
                 console.log( { result } );
                 this.taskData = result;
@@ -153,10 +155,12 @@ export default class SOFDisconnectPanel extends LightningElement {
                     } );
                     this.dispatchEvent( evt );
                     this.isLoading = false;
-                    }
+                }
+                }, 3000 );
             }
         )
             .catch( error => {
+                // 
                 console.log( 'getTasks error', error );
                 const evt = new ShowToastEvent( {
                         title: 'Unable To Start Disconnect Process',
@@ -165,6 +169,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                     } );
                 this.dispatchEvent( evt );
                 this.isLoading = false;
+                this.noProjectFound = true;
             }
         );
     }
@@ -192,15 +197,13 @@ export default class SOFDisconnectPanel extends LightningElement {
     }
     
     updateTasks( event ) {
-        event.preventDefault();
-        
-        setTimeout( () => {
-        
+        event.preventDefault();      
             const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
             console.log( 'taskRecords', records );
             this.isLoading = true;
             updateMilestone1Tasks( { tasks: records } )
                 .then( result => {
+                    setTimeout( () => {
                     console.log( 'updateMilestone1Tasks result', result );
                     this.getTasks();
                     this.hasTasks = false;
@@ -210,9 +213,11 @@ export default class SOFDisconnectPanel extends LightningElement {
                         variant: 'brand',
                     } );
                     this.dispatchEvent( evt );
-                    this.isLoading = false;
+                        this.isLoading = false;
+                    }, 3000 );
                 } )
                 .catch( error => {
+                    
                     console.log( 'updateMilestone1Tasks error', error );
                     this.hasTasks = false;
                     const evt = new ShowToastEvent( {
@@ -224,7 +229,6 @@ export default class SOFDisconnectPanel extends LightningElement {
                     this.getTasks();
                     this.isLoading = false;
                 } );
-        }, 100 );
     }
 
     handleCancel(event) {
