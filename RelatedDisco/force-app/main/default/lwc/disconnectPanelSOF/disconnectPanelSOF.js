@@ -42,21 +42,14 @@ export default class SOFDisconnectPanel extends LightningElement {
             console.log( 'error', error );
         }
     }
-    
-    // connectedCallback() {
-    //     console.log( 'recordId', this.recordId );
-    //     // can add multiple if statements to check for different statuses
-    //     if( this.sofStatus == 'Disconnect in Progress' ) {
-    //             this.getTasks();
-    //         }
-    // }
 
     columns = [
         { label: 'Milestone Name', fieldName: 'Milestone_Name__c', type: 'text' },
         { label: 'Task Name', fieldName: 'Name', type: 'text' },
         { label: 'Complete', fieldName: 'MPM4_BASE__Complete__c', type: 'boolean', editable: true },
         { label: 'Not Needed', fieldName: 'Not_Applicable__c', type: 'boolean', editable: true },
-        { label: 'Resource', fieldName: 'Resource_Name__c', type: 'text', editable: true }
+        { label: 'Resource', fieldName: 'Resource_Name__c', type: 'text', editable: true },
+        { label: 'Record Link', fieldName: 'recordLink', type: 'url', typeAttributes: { label: 'View Task Record', target: '_blank' } }
     ];
 
     initiateDisconnect() {
@@ -146,7 +139,12 @@ export default class SOFDisconnectPanel extends LightningElement {
                 console.log( 'getTasks ' );
                 console.log( { result } );
                 if ( result !=null ) {
-                    this.taskData = result;
+                    this.taskData = result.map( task => {
+                        return {
+                            ...task,
+                            recordLink:`/lightning/r/MPM4_BASE__Milestone1_Task__c/${task.Id}/view`
+                        };
+                    } );
                     this.isDiscoInProg = true;
                     const evt = new ShowToastEvent( {
                         title: 'Disconnect Process Started',
@@ -174,6 +172,23 @@ export default class SOFDisconnectPanel extends LightningElement {
                 this.isLoading = false;
             }
         );
+    }
+
+    handleRowAction( event ) {
+        const actionName = event.detail.action.name;
+        const row = event.detail.row;
+        switch (actionName) {
+            case 'view_details':
+                this[ NavigationMixin.Navigate ]( {
+                    type: 'standard__recordPage',
+                    attributes: {
+                        recordId: row.Id,
+                        actionName: 'view'
+                    }
+                }, true ); // Set true to open in a new tab, false to open in the same tab
+                break;
+            default:
+        }
     }
 
     onCellChange( event ) {
