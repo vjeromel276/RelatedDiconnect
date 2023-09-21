@@ -22,6 +22,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @api hasTasks = false;
     @track isLoading = false;
     @track tasksFetchError = false;
+    @track useNewTable = false;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -30,6 +31,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.isLoading = false;
             console.log( 'data', data );
             this.record = data;
+            this.useNewTable = true;
             this.sofStatus = this.record.fields.Status.value;
             this.selectedDate = this.record.fields.Customer_Requested_Disconnect_Date__c;
             const date = JSON.parse( JSON.stringify( this.selectedDate ) );
@@ -45,13 +47,12 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     columns = [
         { label: 'Milestone Name', fieldName: 'Milestone_Name__c', type: 'text' },
-        { label: 'Task Name', fieldName: 'Name', type: 'text' },
+        { label: 'Task Name', fieldName: 'recordLink', type: 'url', typeAttributes: { label: { fieldName: 'Name' }, target: '_blank' } },
         { label: 'Complete', fieldName: 'MPM4_BASE__Complete__c', type: 'boolean', editable: true },
         { label: 'Not Needed', fieldName: 'Not_Applicable__c', type: 'boolean', editable: true },
-        { label: 'Resource', fieldName: 'Resource_Name__c', type: 'text', editable: true },
-        { label: 'Record Link', fieldName: 'recordLink', type: 'url', typeAttributes: { label: 'View Task Record', target: '_blank' } }
     ];
 
+    // funtion for the disconnect button
     initiateDisconnect() {
         if ( this.selectedDate == '' || this.selectedDate == null ) {
             const evt = new ShowToastEvent( {
@@ -131,18 +132,20 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
     }
     
+    // function to get the tasks
     getTasks() {
         this.isLoading = true;
         const outputID = this.recordId
+        const updateTrys = 5;
         getTasks( { recordId: outputID } )
             .then( result => {
                 console.log( 'getTasks ' );
                 console.log( { result } );
-                if ( result !=null ) {
+                if ( result != null ) {
                     this.taskData = result.map( task => {
                         return {
                             ...task,
-                            recordLink:`/lightning/r/MPM4_BASE__Milestone1_Task__c/${task.Id}/view`
+                            recordLink: `/lightning/r/MPM4_BASE__Milestone1_Task__c/${ task.Id }/view`
                         };
                     } );
                     this.isDiscoInProg = true;
@@ -164,98 +167,142 @@ export default class SOFDisconnectPanel extends LightningElement {
             .catch( error => {
                 console.log( 'getTasks error', error );
                 const evt = new ShowToastEvent( {
-                        title: 'Unable To Start Disconnect Process',
-                        message: 'The disconnect process has not been started.',
-                        variant: 'error',
-                    } );
+                    title: 'Unable To Start Disconnect Process',
+                    message: 'The disconnect process has not been started.',
+                    variant: 'error',
+                } );
                 this.dispatchEvent( evt );
                 this.isLoading = false;
             }
-        );
+            );
     }
 
-    handleRowAction( event ) {
-        const actionName = event.detail.action.name;
-        const row = event.detail.row;
-        switch (actionName) {
-            case 'view_details':
-                this[ NavigationMixin.Navigate ]( {
-                    type: 'standard__recordPage',
-                    attributes: {
-                        recordId: row.Id,
-                        actionName: 'view'
-                    }
-                }, true ); // Set true to open in a new tab, false to open in the same tab
-                break;
-            default:
+    handleCheckboxChange( event ) {
+        console.log('checkbox change', event.target.checked);
+        const field = event.target.dataset.field;
+        const taskId = event.target.dataset.id;
+        const isChecked = event.target.checked;
+        
+        let index = this.taskData.findIndex( task => task.Id === taskId );
+        if ( index !== -1 ) {
+            this.taskData[ index ][ field ] = isChecked;
         }
-    }
+        // Define fields for record update
+        const fields = {};
+        fields['Id'] = taskId;
+        fields[field] = isChecked;
 
-    onCellChange( event ) {
-        console.log( 'event.detail.draftValues', event.detail.draftValues[0] );
-        this.draftValues = event.detail.draftValues;
-         // Loop through each draft value
-        this.draftValues.forEach( draft => {
-            // Find the index of the task in the taskData array that has the same Id as the draft
-            let index = this.taskData.findIndex( task => task.Id === draft.Id );
-
-            // If a task with the same Id is found, update it with the draft values
-            if ( index !== -1 ) {
-                this.taskData[ index ] = { ...this.taskData[ index ], ...draft };
-            }
-            this.isLoading = true;
-        } );
-            
-        // console.log( 'this.taskData', this.taskData );
-        this.draftValues = [];
-        this.taskData = [ ...this.taskData ];
-        this.hasTasks = true;
-        this.isLoading = false;
-    }
-    
-    updateTasks( event ) {
-        event.preventDefault();
-        
-        setTimeout( () => {
-        
-            const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
-            console.log( 'taskRecords', records );
-            this.isLoading = true;
-            updateMilestone1Tasks( { tasks: records } )
-                .then( result => {
-                    console.log( 'updateMilestone1Tasks result', result );
-                    this.getTasks();
-                    this.hasTasks = false;
-                    const evt = new ShowToastEvent( {
-                        title: 'Milestone1 Tasks Updated',
-                        message: 'The record has been updated.',
-                        variant: 'brand',
-                    } );
-                    this.dispatchEvent( evt );
-                    this.isLoading = false;
-                } )
-                .catch( error => {
-                    console.log( 'updateMilestone1Tasks error', error );
-                    this.hasTasks = false;
-                    const evt = new ShowToastEvent( {
-                        title: 'Milestone1 Tasks Update Failed',
-                        message: 'The record has not been updated. Try again.',
-                        variant: 'error',
-                    } );
-                    this.dispatchEvent( evt );
-                    this.getTasks();
-                    this.isLoading = false;
+        // Create recordInput object
+        const recordInput = { fields };
+        console.log( 'recordInput', recordInput );
+        this.isLoading = true;
+        updateRecord( recordInput )
+            .then( result => {
+                console.log( 'updateRecord result', result );
+                this.getTasks();
+                const evt = new ShowToastEvent( {
+                    title: 'Record Updated',
+                    message: 'The record has been updated.',
+                    variant: 'brand',
                 } );
-        }, 100 );
+                this.dispatchEvent( evt );
+                this.isLoading = false;
+            } )
+            .catch( error => {
+                console.log( 'updateRecord error', error );
+                this.getTasks();
+                const evt = new ShowToastEvent( {
+                    title: 'Record Update Failed',
+                    message: 'The record has not been updated.',
+                    variant: 'error',
+                } );
+                this.dispatchEvent( evt );
+                this.isLoading = false;
+            } );
     }
+    //& Commented out this is for the old sale
+    // handleRowAction( event ) {
+    //     const actionName = event.detail.action.name;
+    //     const row = event.detail.row;
+    //     switch (actionName) {
+    //         case 'view_details':
+    //             this[ NavigationMixin.Navigate ]( {
+    //                 type: 'standard__recordPage',
+    //                 attributes: {
+    //                     recordId: row.Id,
+    //                     actionName: 'view'
+    //                 }
+    //             }, true ); // Set true to open in a new tab, false to open in the same tab
+    //             break;
+    //         default:
+    //     }
+    // }
 
-    handleCancel(event) {
-        event.preventDefault();
-        this.getTasks();
-        this.draftValues = [];
-        this.hasTasks = false;
-        this.isLoading = false;
-    }
+    // onCellChange( event ) {
+    //     console.log( 'event.detail.draftValues', event.detail.draftValues[0] );
+    //     this.draftValues = event.detail.draftValues;
+    //      // Loop through each draft value
+    //     this.draftValues.forEach( draft => {
+    //         // Find the index of the task in the taskData array that has the same Id as the draft
+    //         let index = this.taskData.findIndex( task => task.Id === draft.Id );
+
+    //         // If a task with the same Id is found, update it with the draft values
+    //         if ( index !== -1 ) {
+    //             this.taskData[ index ] = { ...this.taskData[ index ], ...draft };
+    //         }
+    //         this.isLoading = true;
+    //     } );
+            
+    //     // console.log( 'this.taskData', this.taskData );
+    //     this.draftValues = [];
+    //     this.taskData = [ ...this.taskData ];
+    //     this.hasTasks = true;
+    //     this.isLoading = false;
+    // }
+    
+    // updateTasks( event ) {
+    //     event.preventDefault();
+        
+    //     setTimeout( () => {
+        
+    //         const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
+    //         console.log( 'taskRecords', records );
+    //         this.isLoading = true;
+    //         updateMilestone1Tasks( { tasks: records } )
+    //             .then( result => {
+    //                 console.log( 'updateMilestone1Tasks result', result );
+    //                 this.getTasks();
+    //                 this.hasTasks = false;
+    //                 const evt = new ShowToastEvent( {
+    //                     title: 'Milestone1 Tasks Updated',
+    //                     message: 'The record has been updated.',
+    //                     variant: 'brand',
+    //                 } );
+    //                 this.dispatchEvent( evt );
+    //                 this.isLoading = false;
+    //             } )
+    //             .catch( error => {
+    //                 console.log( 'updateMilestone1Tasks error', error );
+    //                 this.hasTasks = false;
+    //                 const evt = new ShowToastEvent( {
+    //                     title: 'Milestone1 Tasks Update Failed',
+    //                     message: 'The record has not been updated. Try again.',
+    //                     variant: 'error',
+    //                 } );
+    //                 this.dispatchEvent( evt );
+    //                 this.getTasks();
+    //                 this.isLoading = false;
+    //             } );
+    //     }, 100 );
+    // }
+
+    // handleCancel(event) {
+    //     event.preventDefault();
+    //     this.getTasks();
+    //     this.draftValues = [];
+    //     this.hasTasks = false;
+    //     this.isLoading = false;
+    // }
     
     handleDateChange( event ) {
         this.selectedDate = event.target.value;

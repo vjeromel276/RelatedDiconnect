@@ -35,6 +35,7 @@
                         ></lightning-spinner>
                     </template>
                     <template if:false={isLoading}>
+
                         <lightning-tile title="Customer Selected Disconnect Date">
                             <lightning-formatted-date-time
                                 value={selectedDate}
@@ -43,20 +44,79 @@
                                 day="2-digit"
                             ></lightning-formatted-date-time>
                         </lightning-tile>
+<!-- 
+    #####this is the salesforce datatable replaced by a standard html table########
                         <lightning-card>
+                            <template if:false={useNewTable}>
+                                <lightning-datatable
+                                    key-field="Id"
+                                    data={taskData}
+                                    show-row-number-column="true"
+                                    columns={columns}
+                                    oncellchange={onCellChange}
+                                    errors={errors}
+                                    draft-values={draftValues}
+                                    onrowaction={handleRowAction}
+                                    hide-checkbox-column="true"
+                                ></lightning-datatable>
+                            </template>
+                        </lightning-card> -->
 
-                            <lightning-datatable
-                                key-field="Id"
-                                data={taskData}
-                                show-row-number-column="true"
-                                columns={columns}
-                                oncellchange={onCellChange}
-                                errors={errors}
-                                draft-values={draftValues}
-                                onrowaction={handleRowAction}
-                                hide-checkbox-column="true"
-                            ></lightning-datatable>
-                        </lightning-card>
+                        <template if:true={useNewTable}>
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-table_bordered"
+                                aria-labelledby="element-with-table-label other-element-with-table-label"
+                            >
+                                <tbody>
+
+                                    <tr>
+                                        <th>Milestone Name</th>
+                                        <th>Task Name</th>
+                                        <th>Complete</th>
+                                        <th>Not Needed</th>
+                                    </tr>
+                                    <template
+                                        for:each={taskData}
+                                        for:item="task"
+                                    >
+                                        <tr key={task.Id}>
+                                            <td>{task.Milestone_Name__c}</td>
+                                            <td>
+                                                <a
+                                                    href={task.recordLink}
+                                                    target="_blank"
+                                                >
+                                                    {task.Name}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={task.MPM4_BASE__Complete__c}
+                                                    data-id={task.Id}
+                                                    data-field="MPM4_BASE__Complete__c"
+                                                    onchange={handleCheckboxChange}
+                                                    value={task.MPM4_BASE__Complete__c}
+                                                />
+
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={task.Not_Applicable__c}
+                                                    data-id={task.Id}
+                                                    data-field="Not_Applicable__c"
+                                                    onchange={handleCheckboxChange}
+                                                    value={task.Not_Applicable__c}
+                                                />
+                                            </td>
+                                        </tr>
+
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+
                     </template>
                     <template if:true={hasTasks}>
 
