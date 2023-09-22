@@ -1,8 +1,16 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
+import CONTRACT_STATUS from '@salesforce/schema/Order.Service_End_Reason__c';
 import CUST_REQ_DISCO_DATE from '@salesforce/schema/Order.Customer_Requested_Disconnect_Date__c';
+import DISCO_CONTACT from '@salesforce/schema/Order.Disconnect_Contact__c';
+import DISO_REQ_RECIEVED_DATE from '@salesforce/schema/Order.Disconnect_Request_Received_Date__c';
+import END_REASON_NOTES from '@salesforce/schema/Order.End_Reason_Notes__c';
+import EQUIP_PICKUP_FOR_DISCO from '@salesforce/schema/Order.Equipment_Pickup_Needed__c';
+import PROCEED_DISCO from '@salesforce/schema/Order.Proceed_with_Disconnect__c';
+import SERVICE_END_REASON from '@salesforce/schema/Order.Service_End_Reasons__c';
 import STATUS from '@salesforce/schema/Order.Status';
+import SUB_REASONS from '@salesforce/schema/Order.ServiceEndSub_Reasons__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
@@ -23,9 +31,10 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track isLoading = false;
     @track tasksFetchError = false;
     @track useNewTable = false;
+    @track isCheckboxLoading = false;
     result ;
 
-    @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
+    @wire( getRecord, { recordId: '$recordId', fields:[] } )
     getRecordData( { error, data } ) {
         this.isLoading = true;
         if ( data ) {
@@ -94,7 +103,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                             setTimeout( () => {
                                 console.log( 'updateRecord result', result );
                                 this.getTasks();
-                                this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
+                                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
                                 this.isLoading = false;
                             }, 5000 );
                         } )
@@ -122,11 +131,12 @@ export default class SOFDisconnectPanel extends LightningElement {
                     this.taskData = result.map( task => {
                         return {
                             ...task,
+                            
                             recordLink: `/lightning/r/MPM4_BASE__Milestone1_Task__c/${ task.Id }/view`
                         };
                     } );
                     this.isDiscoInProg = true;
-                    this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'warning' );
+                    this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
                     this.tasksFetchError = false;
                 } else {
                     this.isDiscoInProg = true;
@@ -144,6 +154,51 @@ export default class SOFDisconnectPanel extends LightningElement {
             );
     }
 
+    //~ the new new way of doing the data table
+    // handleCheckboxChange(event) {
+    //     event.preventDefault();
+    //     this.isCheckboxLoading = true;
+        
+    //     const fields = {};
+    //     const checkBox = event.target.dataset.field;
+    //     const taskId = event.target.dataset.id;
+    //     const isChecked = event.target.checked;
+
+    //     // Immediately update the local state
+    //     const taskIndex = this.taskData.findIndex(task => task.Id === taskId);
+    //     if (taskIndex !== -1) {
+    //         this.taskData[taskIndex][checkBox] = isChecked;
+    //     }
+        
+    //     // Prepare fields for update
+    //     if (checkBox === 'MPM4_BASE__Complete__c') {
+    //         fields.Id = taskId;
+    //         fields.MPM4_BASE__Complete__c = isChecked;
+    //     } else if (checkBox === 'Not_Applicable__c') {
+    //         fields.Id = taskId;
+    //         fields.Not_Applicable__c = isChecked;
+    //     }
+
+    //     const recordInput = { fields };
+    //         this.retryUpdateRecord( recordInput )
+    //             .then( result => {
+    //                 this.isCheckboxLoading = false;
+    //                 this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
+    //                 this.getTasks();
+    //             } )
+    //             .catch( error => {
+    //                 // Revert local state change if update fails
+    //                 if ( taskIndex !== -1 ) {
+    //                     this.taskData[ taskIndex ][ checkBox ] = !isChecked;
+    //                 }
+    //                 this.isCheckboxLoading = false;
+    //                 this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+    //                 this.getTasks();
+    //             } );
+    // }
+
+    
+    //~ old new way of doing the data table
     handleCheckboxChange( event ) {
         event.preventDefault();
         this.isLoading = true;
@@ -163,30 +218,28 @@ export default class SOFDisconnectPanel extends LightningElement {
         const recordInput = { fields };
         console.log( 'recordInput', recordInput );
         //~ normal salesforce lwc api updateRecord
-        // updateRecord( recordInput )
-        //     .then( result => {
-        //         console.log( 'updateRecord result', result );
-        //         this.getTasks();
-        //         this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
-        //         this.isLoading = false;
-        //     } )
-        //     .catch( error => {
-        //         console.log( 'updateRecord error', error );
-        //         this.getTasks();
-        //         this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-        //         this.isLoading = false;
-        //     } );
+        updateRecord( recordInput )
+            .then( result => {
+                console.log( 'updateRecord result', result );
+                this.getTasks();
+                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+                this.isLoading = false;
+            } )
+            .catch( error => {
+                console.log( 'updateRecord error', error );
+                this.getTasks();
+                this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                this.isLoading = false;
+            } );
         
-        try {
-            const result = this.retryUpdateRecord( recordInput );
-            console.log( 'updateRecord result', result);
-            this.getTasks();
-            this.isLoading = false;
-        } catch (error) {
-            console.log( 'updateRecord error', error );
-            this.getTasks();
-            this.isLoading = false;
-        }
+        // try {
+        //     const result = this.retryUpdateRecord( recordInput );
+        //     console.log( 'updateRecord result', result);
+        //     this.getTasks();
+        // } catch (error) {
+        //     console.log( 'updateRecord error', error );
+        //     this.getTasks();
+        // }
         
     }
     //& Commented out this is for the old sale
@@ -274,13 +327,14 @@ export default class SOFDisconnectPanel extends LightningElement {
     // }
     //& End of old data table handlers 
 
-    async retryUpdateRecord( recordInput, retries = 5, delay = 200 ) {
+    retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
+        this.isCheckboxLoading = true;  // Start loading
         while ( retries > 0 ) {
-            this.isLoading = true;
+            
             console.log('retries', retries);
             try {
-                const result = await updateRecord( recordInput );
-                this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
+                const result = updateRecord( recordInput );
+                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
                 this.getTasks();
                 this.isLoading = false;
                 return result;
@@ -293,9 +347,10 @@ export default class SOFDisconnectPanel extends LightningElement {
                     throw error;
                 }
                 // waits 1 second
-                await new Promise( resolve => setTimeout( resolve, delay ) );
+                new Promise( resolve => setTimeout( resolve, delay ) );
             }
         }
+        this.isCheckboxLoading = false;  // End loading
     }
     
     handleDateChange( event ) {
