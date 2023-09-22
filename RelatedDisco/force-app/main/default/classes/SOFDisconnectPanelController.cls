@@ -31,6 +31,20 @@ public without sharing class SOFDisconnectPanelController{
             update tasks;
         }
     }
+    @AuraEnabled
+    public static void updateMilestone1Task(MPM4_BASE__Milestone1_Task__c task){
+        MPM4_BASE__Milestone1_Task__c taskToUpdate = new MPM4_BASE__Milestone1_Task__c();
+        taskToUpdate.Id = task.Id;
+        taskToUpdate.MPM4_BASE__Complete__c = task.MPM4_BASE__Complete__c;
+        taskToUpdate.Not_Applicable__c = task.Not_Applicable__c;
+
+        System.debug('updateMilestone1Task');
+        System.debug(task);
+        if (task != null && task.Id != null){
+            System.debug('update task: ' + taskToUpdate);
+            update taskToUpdate;
+        }
+    }
 
     @AuraEnabled
     public static Order getSofDetails(String recordId){

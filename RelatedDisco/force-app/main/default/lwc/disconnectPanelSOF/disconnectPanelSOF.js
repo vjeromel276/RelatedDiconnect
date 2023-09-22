@@ -6,7 +6,7 @@ import STATUS from '@salesforce/schema/Order.Status';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
-import updateMilestone1Tasks from '@salesforce/apex/SOFDisconnectPanelController.updateMilestone1Tasks';
+import updateMilestone1Task from '@salesforce/apex/SOFDisconnectPanelController.updateMilestone1Task';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
@@ -23,6 +23,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track isLoading = false;
     @track tasksFetchError = false;
     @track useNewTable = false;
+    result ;
 
     @wire( getRecord, { recordId: '$recordId', fields: [ STATUS,CUST_REQ_DISCO_DATE ] } )
     getRecordData( { error, data } ) {
@@ -55,12 +56,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     // funtion for the disconnect button
     initiateDisconnect() {
         if ( this.selectedDate == '' || this.selectedDate == null ) {
-            const evt = new ShowToastEvent( {
-                title: 'You must select a date',
-                message: 'There must be a customer requested disconnect date',
-                variant: 'warning',
-            } );
-            this.dispatchEvent( evt );
+            this.showToast( 'You must select a date', 'There must be a customer requested disconnect date', 'warning' );
         } else {
             this.isLoading = true;
             const fields = {};
@@ -81,22 +77,12 @@ export default class SOFDisconnectPanel extends LightningElement {
                         .then( result => {
                             console.log( 'initiateDisconnect result', result );
                             this.getTasks();
-                            const evt = new ShowToastEvent( {
-                                title: 'Record Updated',
-                                message: 'The record has been updated.',
-                                variant: 'brand',
-                            } );
-                            this.dispatchEvent( evt );
+                            this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
                             this.isLoading = false;
                         } )
                         .catch( error => {
                             console.log( 'initiateDisconnect error', error );
-                            const evt = new ShowToastEvent( {
-                                title: 'Record Update Failed',
-                                message: 'The record has not been updated.',
-                                variant: 'error',
-                            } );
-                            this.dispatchEvent( evt );
+                            this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
                             this.isLoading = false;
                         } );
                 }, 5000 );
@@ -108,23 +94,13 @@ export default class SOFDisconnectPanel extends LightningElement {
                             setTimeout( () => {
                                 console.log( 'updateRecord result', result );
                                 this.getTasks();
-                                const evt = new ShowToastEvent( {
-                                    title: 'Record Updated',
-                                    message: 'The record has been updated.',
-                                    variant: 'brand',
-                                } );
-                                this.dispatchEvent( evt );
+                                this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
                                 this.isLoading = false;
                             }, 5000 );
                         } )
                         .catch( error => {
                             console.log( 'updateRecord error', error );
-                            const evt = new ShowToastEvent( {
-                                title: 'Record Update Failed',
-                                message: 'The record has not been updated.',
-                                variant: 'error',
-                            } );
-                            this.dispatchEvent( evt );
+                            this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
                             this.isLoading = false;
                         } );
                 
@@ -141,6 +117,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             .then( result => {
                 console.log( 'getTasks ' );
                 console.log( { result } );
+                this.result = result;
                 if ( result != null ) {
                     this.taskData = result.map( task => {
                         return {
@@ -149,12 +126,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                         };
                     } );
                     this.isDiscoInProg = true;
-                    const evt = new ShowToastEvent( {
-                        title: 'Disconnect Process Started',
-                        message: 'The disconnect process has been started.',
-                        variant: 'warning',
-                    } );
-                    this.dispatchEvent( evt );
+                    this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'warning' );
                     this.tasksFetchError = false;
                 } else {
                     this.isDiscoInProg = true;
@@ -166,59 +138,56 @@ export default class SOFDisconnectPanel extends LightningElement {
             )
             .catch( error => {
                 console.log( 'getTasks error', error );
-                const evt = new ShowToastEvent( {
-                    title: 'Unable To Start Disconnect Process',
-                    message: 'The disconnect process has not been started.',
-                    variant: 'error',
-                } );
-                this.dispatchEvent( evt );
+                this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
                 this.isLoading = false;
             }
             );
     }
 
     handleCheckboxChange( event ) {
-        console.log('checkbox change', event.target.checked);
-        const field = event.target.dataset.field;
-        const taskId = event.target.dataset.id;
-        const isChecked = event.target.checked;
-        
-        let index = this.taskData.findIndex( task => task.Id === taskId );
-        if ( index !== -1 ) {
-            this.taskData[ index ][ field ] = isChecked;
-        }
-        // Define fields for record update
+        event.preventDefault();
+        this.isLoading = true;
         const fields = {};
-        fields['Id'] = taskId;
-        fields[field] = isChecked;
-
-        // Create recordInput object
+        const checkBox = event.target.dataset.field;
+        console.log( 'checkBox', checkBox );
+        if ( checkBox === 'MPM4_BASE__Complete__c' ) {
+            fields.Id = event.target.dataset.id;
+            fields.MPM4_BASE__Complete__c = event.target.checked;
+        } else if ( checkBox === 'Not_Applicable__c' ) {
+            fields.Id = event.target.dataset.id;
+            fields.Not_Applicable__c = event.target.checked;
+        }
+        
+        const thisTaskList = this.result;
+        console.log( 'thisTaskList', thisTaskList );   
         const recordInput = { fields };
         console.log( 'recordInput', recordInput );
-        this.isLoading = true;
-        updateRecord( recordInput )
-            .then( result => {
-                console.log( 'updateRecord result', result );
-                this.getTasks();
-                const evt = new ShowToastEvent( {
-                    title: 'Record Updated',
-                    message: 'The record has been updated.',
-                    variant: 'brand',
-                } );
-                this.dispatchEvent( evt );
-                this.isLoading = false;
-            } )
-            .catch( error => {
-                console.log( 'updateRecord error', error );
-                this.getTasks();
-                const evt = new ShowToastEvent( {
-                    title: 'Record Update Failed',
-                    message: 'The record has not been updated.',
-                    variant: 'error',
-                } );
-                this.dispatchEvent( evt );
-                this.isLoading = false;
-            } );
+        //~ normal salesforce lwc api updateRecord
+        // updateRecord( recordInput )
+        //     .then( result => {
+        //         console.log( 'updateRecord result', result );
+        //         this.getTasks();
+        //         this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
+        //         this.isLoading = false;
+        //     } )
+        //     .catch( error => {
+        //         console.log( 'updateRecord error', error );
+        //         this.getTasks();
+        //         this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+        //         this.isLoading = false;
+        //     } );
+        
+        try {
+            const result = this.retryUpdateRecord( recordInput );
+            console.log( 'updateRecord result', result);
+            this.getTasks();
+            this.isLoading = false;
+        } catch (error) {
+            console.log( 'updateRecord error', error );
+            this.getTasks();
+            this.isLoading = false;
+        }
+        
     }
     //& Commented out this is for the old sale
     // handleRowAction( event ) {
@@ -303,10 +272,44 @@ export default class SOFDisconnectPanel extends LightningElement {
     //     this.hasTasks = false;
     //     this.isLoading = false;
     // }
+    //& End of old data table handlers 
+
+    async retryUpdateRecord( recordInput, retries = 5, delay = 200 ) {
+        while ( retries > 0 ) {
+            this.isLoading = true;
+            console.log('retries', retries);
+            try {
+                const result = await updateRecord( recordInput );
+                this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
+                this.getTasks();
+                this.isLoading = false;
+                return result;
+            } catch ( error ) {
+                retries -= 1;
+                if ( retries === 0 ) {
+                    this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                    this.getTasks();
+                    this.isLoading = false;
+                    throw error;
+                }
+                // waits 1 second
+                await new Promise( resolve => setTimeout( resolve, delay ) );
+            }
+        }
+    }
     
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
     }
-        
+
+    // toast message helper function
+    showToast(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+        this.dispatchEvent(evt);
+    }        
 }
