@@ -2,16 +2,162 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <template if:false={tasksFetchError}>
-        <lightning-card title="Disconnection Task List">
+        <lightning-card title="Disconnection Panel">
             <lightning-spinner
                 if:true={isLoading}
                 alternative-text="Loading"
                 size="large"
             ></lightning-spinner>
             <template if:false={isLoading}>
-
+                <div
+                    class="slds-form"
+                    role="list"
+                >
+                    <div class="slds-form__row">
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">
+                                    Contract Status: </span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">
+                                        {contractStatus}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Disconnect Request Received Date</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">
+                                        {discoReqRecievedDate}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form__row">
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Equipment Pickup Needed for Disconnect</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{equipPickupForDisco}</div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Custom Requested Disconnect Date</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{custReqDiscoDate}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form__row">
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Service End Reason</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">
+                                        {serviceEndReason}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Proceed With Disconnect</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{proceedDisco}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form__row">
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Sub-Reasons</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{subReasons}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                <span class="slds-form-element__label">Disconnect Contact</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{discoContact}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form__row">
+                        <div
+                            class="slds-form__item"
+                            role="listitem"
+                        >
+                            <div
+                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-form-element_1-col">
+                                <span class="slds-form-element__label">End Reasons Notes</span>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static slds-text-longform">{endReasonNotes}
+                                        <br />
+                                    </div>
+                                    <button
+                                        class="slds-button slds-button_icon"
+                                        title="Edit: End Reasons Notes"
+                                    >
+                                        <svg
+                                            class="slds-button__icon slds-button__icon_hint"
+                                            aria-hidden="true"
+                                        >
+                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#edit"></use>
+                                        </svg>
+                                        <span class="slds-assistive-text">Edit: End Reasons Notes</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <br>
+            <div class="slds-align_absolute-center"> <h3>Disconnect Task List</h3></div>
                 <template if:false={isDiscoInProg}>
-                    <lightning-card>
+                    <lightning-card title="Disconnect Task List">
                         <lightning-input
                             style="width: 300px;"
                             type="date"
@@ -26,7 +172,6 @@
                         onclick={initiateDisconnect}
                     ></lightning-button>
                 </template>
-
                 <template if:true={isDiscoInProg}>
                     <template if:true={isLoading}>
                         <lightning-spinner
@@ -35,7 +180,6 @@
                         ></lightning-spinner>
                     </template>
                     <template if:false={isLoading}>
-
                         <lightning-tile title="Customer Selected Disconnect Date">
                             <lightning-formatted-date-time
                                 value={selectedDate}
@@ -44,31 +188,12 @@
                                 day="2-digit"
                             ></lightning-formatted-date-time>
                         </lightning-tile>
-<!-- 
-    #####this is the salesforce datatable replaced by a standard html table########
-                        <lightning-card>
-                            <template if:false={useNewTable}>
-                                <lightning-datatable
-                                    key-field="Id"
-                                    data={taskData}
-                                    show-row-number-column="true"
-                                    columns={columns}
-                                    oncellchange={onCellChange}
-                                    errors={errors}
-                                    draft-values={draftValues}
-                                    onrowaction={handleRowAction}
-                                    hide-checkbox-column="true"
-                                ></lightning-datatable>
-                            </template>
-                        </lightning-card> -->
-
                         <template if:true={useNewTable}>
                             <table
                                 class="slds-table slds-table_cell-buffer slds-table_bordered"
                                 aria-labelledby="element-with-table-label other-element-with-table-label"
                             >
                                 <tbody>
-
                                     <tr>
                                         <th>Milestone Name</th>
                                         <th>Task Name</th>
@@ -91,15 +216,13 @@
                                             </td>
                                             <td>
                                                 <input
-                                                    type="checkbox"                                                    
+                                                    type="checkbox"
                                                     checked={task.MPM4_BASE__Complete__c}
                                                     data-id={task.Id}
                                                     data-field="MPM4_BASE__Complete__c"
                                                     onchange={handleCheckboxChange}
                                                     value={task.MPM4_BASE__Complete__c}
-                                                    
                                                 />
-
                                             </td>
                                             <td>
                                                 <input
@@ -112,12 +235,10 @@
                                                 />
                                             </td>
                                         </tr>
-
                                     </template>
                                 </tbody>
                             </table>
                         </template>
-
                     </template>
                     <template if:true={hasTasks}>
 

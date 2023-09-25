@@ -1,9 +1,11 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
+import CONTACT from '@salesforce/schema/Contact';
 import CONTRACT_STATUS from '@salesforce/schema/Order.Service_End_Reason__c';
 import CUST_REQ_DISCO_DATE from '@salesforce/schema/Order.Customer_Requested_Disconnect_Date__c';
 import DISCO_CONTACT from '@salesforce/schema/Order.Disconnect_Contact__c';
+import DISCO_CONTACT_FULLNAME from '@salesforce/schema/Order.Disconnect_Contact__r.Name';
 import DISO_REQ_RECIEVED_DATE from '@salesforce/schema/Order.Disconnect_Request_Received_Date__c';
 import END_REASON_NOTES from '@salesforce/schema/Order.End_Reason_Notes__c';
 import EQUIP_PICKUP_FOR_DISCO from '@salesforce/schema/Order.Equipment_Pickup_Needed__c';
@@ -32,9 +34,48 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track tasksFetchError = false;
     @track useNewTable = false;
     @track isCheckboxLoading = false;
-    result ;
+    contractStatus = '';
+    custReqDiscoDate = '';
+    discoContact = [];
+    discoContactName = {};
+    discoReqRecievedDate = '';
+    endReasonNotes = '';
+    equipPickupForDisco = '';
+    proceedDisco = '';
+    serviceEndReason = '';
+    status = '';
+    subReasons = '';
+    
+    result;
+    fields = [
+        'Order.Id',
+        'Order.Status',
+        'Order.Service_End_Reason__c',
+        'Order.Customer_Requested_Disconnect_Date__c',
+        'Order.Disconnect_Contact__c',
+        'Order.Disconnect_Contact__r.Name',
+        'Order.Disconnect_Request_Received_Date__c',
+        'Order.End_Reason_Notes__c',
+        'Order.Equipment_Pickup_Needed__c',
+        'Order.Proceed_with_Disconnect__c',
+        'Order.Service_End_Reasons__c',
+        'Order.ServiceEndSub_Reasons__c',
+    ];
+    // fields = [
+    //     DISCO_CONTACT,
+    //     DISO_REQ_RECIEVED_DATE,
+    //     CONTRACT_STATUS,
+    //     CUST_REQ_DISCO_DATE,
+    //     END_REASON_NOTES,
+    //     EQUIP_PICKUP_FOR_DISCO,
+    //     PROCEED_DISCO,
+    //     SERVICE_END_REASON,
+    //     STATUS,
+    //     SUB_REASONS,
+    //     DISCO_CONTACT_FULLNAME
+    // ];
 
-    @wire( getRecord, { recordId: '$recordId', fields:[] } )
+    @wire( getRecord, { recordId: '$recordId', fields:'$fields' } )
     getRecordData( { error, data } ) {
         this.isLoading = true;
         if ( data ) {
@@ -43,9 +84,23 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.record = data;
             this.useNewTable = true;
             this.sofStatus = this.record.fields.Status.value;
-            this.selectedDate = this.record.fields.Customer_Requested_Disconnect_Date__c;
-            const date = JSON.parse( JSON.stringify( this.selectedDate ) );
-            this.selectedDate = date.displayValue;
+            this.contractStatus = this.record.fields.Service_End_Reason__c.value;
+            this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
+            this.discoContact = this.record.fields.Disconnect_Contact__c.value;
+            this.discoContactName = this.record.fields.Disconnect_Contact__r.value;
+            this.discoReqRecievedDate = this.record.fields.Disconnect_Request_Received_Date__c.value;
+            this.endReasonNotes = this.record.fields.End_Reason_Notes__c.value;
+            this.equipPickupForDisco = this.record.fields.Equipment_Pickup_Needed__c.value;
+            this.proceedDisco = this.record.fields.Proceed_with_Disconnect__c.value;
+            this.serviceEndReason = this.record.fields.Service_End_Reasons__c.value;
+            this.status = this.record.fields.Status.value;
+            this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
+            console.log( 'this.sofStatus', this.sofStatus );
+            console.log( 'this.contractStatus', this.contractStatus );
+            console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
+            console.log( 'this.discoContact', this.discoContact );
+                        
+            
             // can add multiple if statements to check for different statuses
             if( this.sofStatus == 'Disconnect in Progress' ) {
                 this.getTasks();
