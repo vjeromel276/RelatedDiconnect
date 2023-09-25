@@ -99,7 +99,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             console.log( 'this.contractStatus', this.contractStatus );
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
             console.log( 'this.discoContact', this.discoContact );
-                        
+            
             
             // can add multiple if statements to check for different statuses
             if( this.sofStatus == 'Disconnect in Progress' ) {
