@@ -9,6 +9,7 @@
                 size="large"
             ></lightning-spinner>
             <template if:false={isLoading}>
+
                 <div
                     class="slds-form"
                     role="list"
@@ -154,114 +155,98 @@
                         </div>
                     </div>
                 </div>
+
                 <br>
-                <lightning-card
-                    title="Disconnect Task List"
-                    class="slds-align_absolute-center"
-                >
-                    <template if:false={isDiscoInProg}>
-                        <lightning-card title="Disconnect Task List">
-                            <lightning-input
-                                style="width: 300px;"
-                                type="date"
-                                label="Enter Customer Requested Disconnect Date"
+
+
+                <template if:false={isDiscoInProg}>
+                    <lightning-card title="Disconnect Task List">
+                        <lightning-input
+                            style="width: 300px;"
+                            type="date"
+                            label="Enter Customer Requested Disconnect Date"
+                            value={selectedDate}
+                            onchange={handleDateChange}
+                        ></lightning-input>
+                    </lightning-card>
+                    <lightning-button
+                        variant="brand"
+                        label="Disconnect"
+                        onclick={initiateDisconnect}
+                    ></lightning-button>
+                </template>
+                <template if:true={isDiscoInProg}>
+
+                    <template if:true={isLoading}>
+                        <lightning-spinner
+                            alternative-text="Loading"
+                            size="large"
+                        ></lightning-spinner>
+                    </template>
+
+                    <template if:false={isLoading}>
+                        <lightning-tile title="Customer Selected Disconnect Date">
+                            <lightning-formatted-date-time
                                 value={selectedDate}
-                                onchange={handleDateChange}
-                            ></lightning-input>
-                        </lightning-card>
-                        <lightning-button
-                            variant="brand"
-                            label="Disconnect"
-                            onclick={initiateDisconnect}
-                        ></lightning-button>
-                    </template>
-                    <template if:true={isDiscoInProg}>
-                        <template if:true={isLoading}>
-                            <lightning-spinner
-                                alternative-text="Loading"
-                                size="large"
-                            ></lightning-spinner>
-                        </template>
-                        <template if:false={isLoading}>
-                            <lightning-tile title="Customer Selected Disconnect Date">
-                                <lightning-formatted-date-time
-                                    value={selectedDate}
-                                    year="numeric"
-                                    month="long"
-                                    day="2-digit"
-                                ></lightning-formatted-date-time>
-                            </lightning-tile>
-                            <template if:true={useNewTable}>
-                                <table
-                                    class="slds-table slds-table_cell-buffer slds-table_bordered"
-                                    aria-labelledby="element-with-table-label other-element-with-table-label"
-                                >
-                                    <tbody>
-                                        <tr>
-                                            <th>Milestone Name</th>
-                                            <th>Task Name</th>
-                                            <th>Complete</th>
-                                            <th>Not Needed</th>
+                                year="numeric"
+                                month="long"
+                                day="2-digit"
+                            ></lightning-formatted-date-time>
+                        </lightning-tile>
+                        <template if:true={useNewTable}>
+
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-table_bordered"
+                                aria-labelledby="element-with-table-label other-element-with-table-label"
+                            >
+                                <tbody>
+                                    <tr>
+                                        <th>Milestone Name</th>
+                                        <th>Task Name</th>
+                                        <th>Complete</th>
+                                        <th>Not Needed</th>
+                                    </tr>
+                                    <template
+                                        for:each={taskData}
+                                        for:item="task"
+                                    >
+                                        <tr key={task.Id}>
+                                            <td>{task.Milestone_Name__c}</td>
+                                            <td>
+                                                <a
+                                                    href={task.recordLink}
+                                                    target="_blank"
+                                                >
+                                                    {task.Name}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={task.MPM4_BASE__Complete__c}
+                                                    data-id={task.Id}
+                                                    data-field="MPM4_BASE__Complete__c"
+                                                    onchange={handleCheckboxChange}
+                                                    value={task.MPM4_BASE__Complete__c}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={task.Not_Applicable__c}
+                                                    data-id={task.Id}
+                                                    data-field="Not_Applicable__c"
+                                                    onchange={handleCheckboxChange}
+                                                    value={task.Not_Applicable__c}
+                                                />
+                                            </td>
                                         </tr>
-                                        <template
-                                            for:each={taskData}
-                                            for:item="task"
-                                        >
-                                            <tr key={task.Id}>
-                                                <td>{task.Milestone_Name__c}</td>
-                                                <td>
-                                                    <a
-                                                        href={task.recordLink}
-                                                        target="_blank"
-                                                    >
-                                                        {task.Name}
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={task.MPM4_BASE__Complete__c}
-                                                        data-id={task.Id}
-                                                        data-field="MPM4_BASE__Complete__c"
-                                                        onchange={handleCheckboxChange}
-                                                        value={task.MPM4_BASE__Complete__c}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={task.Not_Applicable__c}
-                                                        data-id={task.Id}
-                                                        data-field="Not_Applicable__c"
-                                                        onchange={handleCheckboxChange}
-                                                        value={task.Not_Applicable__c}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </template>
-                        </template>
-                        <template if:true={hasTasks}>
-
-                            <lightning-button
-                                class="slds-var-m-around_x-small"
-                                variant="brand"
-                                label="Update Tasks"
-                                onclick={updateTasks}
-                            ></lightning-button>
-
-                            <lightning-button
-                                class="slds-var-m-around_x-small"
-                                variant="brand"
-                                label="Cancel Update"
-                                onclick={handleCancel}
-                            ></lightning-button>
-
+                                    </template>
+                                </tbody>
+                            </table>
                         </template>
                     </template>
-                </lightning-card>
+                </template>
             </template>
         </lightning-card>
     </template>
