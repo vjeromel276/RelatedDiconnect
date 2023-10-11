@@ -14,7 +14,6 @@
                         class="slds-form"
                         role="list"
                     >
-                    
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -46,7 +45,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -74,7 +72,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -103,7 +100,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -130,7 +126,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -147,13 +142,12 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                </div>
-            <br>
-            <div class="slds-align_absolute-center"> <h3>Disconnect Task List</h3></div>
+                </template>
+                <br>
+                
                 <template if:false={isDiscoInProg}>
-                    <lightning-card title="Disconnect Task List">
+                    <lightning-card >
                         <lightning-input
                             style="width: 300px;"
                             type="date"
@@ -168,6 +162,7 @@
                         onclick={initiateDisconnect}
                     ></lightning-button>
                 </template>
+
                 <template if:true={isDiscoInProg}>
                     <template if:true={isLoading}>
                         <lightning-spinner
@@ -238,31 +233,30 @@
                     </template>
                     <template if:true={hasTasks}>
 
-                            <lightning-button
-                                class="slds-var-m-around_x-small"
-                                variant="brand"
-                                label="Update Tasks"
-                                onclick={updateTasks}
-                            ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-around_x-small"
+                            variant="brand"
+                            label="Update Tasks"
+                            onclick={updateTasks}
+                        ></lightning-button>
 
-                            <lightning-button
-                                class="slds-var-m-around_x-small"
-                                variant="brand"
-                                label="Cancel Update"
-                                onclick={handleCancel}
-                            ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-around_x-small"
+                            variant="brand"
+                            label="Cancel Update"
+                            onclick={handleCancel}
+                        ></lightning-button>
 
-                        </template>
                     </template>
-                </lightning-card>
+
+                </template>
+
             </template>
         </lightning-card>
     </template>
-
     <template if:true={tasksFetchError}>
         <div style="text-align: center; padding: 10px;">
             <p>The Disconnect Project is being generated.</p>
         </div>
     </template>
-
 </template>
