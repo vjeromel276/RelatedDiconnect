@@ -149,12 +149,11 @@
                         </div>
 
                     </div>
-                </template>
-
-                <br>
-                
+                </div>
+            <br>
+            <div class="slds-align_absolute-center"> <h3>Disconnect Task List</h3></div>
                 <template if:false={isDiscoInProg}>
-                    <lightning-card >
+                    <lightning-card title="Disconnect Task List">
                         <lightning-input
                             style="width: 300px;"
                             type="date"
@@ -169,7 +168,6 @@
                         onclick={initiateDisconnect}
                     ></lightning-button>
                 </template>
-
                 <template if:true={isDiscoInProg}>
                     <template if:true={isLoading}>
                         <lightning-spinner
@@ -240,24 +238,23 @@
                     </template>
                     <template if:true={hasTasks}>
 
-                        <lightning-button
-                            class="slds-var-m-around_x-small"
-                            variant="brand"
-                            label="Update Tasks"
-                            onclick={updateTasks}
-                        ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-around_x-small"
+                                variant="brand"
+                                label="Update Tasks"
+                                onclick={updateTasks}
+                            ></lightning-button>
 
-                        <lightning-button
-                            class="slds-var-m-around_x-small"
-                            variant="brand"
-                            label="Cancel Update"
-                            onclick={handleCancel}
-                        ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-around_x-small"
+                                variant="brand"
+                                label="Cancel Update"
+                                onclick={handleCancel}
+                            ></lightning-button>
 
+                        </template>
                     </template>
-
-                </template>
-
+                </lightning-card>
             </template>
         </lightning-card>
     </template>
