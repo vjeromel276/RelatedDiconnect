@@ -1,22 +1,9 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
-import CONTACT from '@salesforce/schema/Contact';
-import CONTRACT_STATUS from '@salesforce/schema/Order.Service_End_Reason__c';
-import CUST_REQ_DISCO_DATE from '@salesforce/schema/Order.Customer_Requested_Disconnect_Date__c';
-import DISCO_CONTACT from '@salesforce/schema/Order.Disconnect_Contact__c';
-import DISCO_CONTACT_FULLNAME from '@salesforce/schema/Order.Disconnect_Contact__r.Name';
-import DISO_REQ_RECIEVED_DATE from '@salesforce/schema/Order.Disconnect_Request_Received_Date__c';
-import END_REASON_NOTES from '@salesforce/schema/Order.End_Reason_Notes__c';
-import EQUIP_PICKUP_FOR_DISCO from '@salesforce/schema/Order.Equipment_Pickup_Needed__c';
-import PROCEED_DISCO from '@salesforce/schema/Order.Proceed_with_Disconnect__c';
-import SERVICE_END_REASON from '@salesforce/schema/Order.Service_End_Reasons__c';
-import STATUS from '@salesforce/schema/Order.Status';
-import SUB_REASONS from '@salesforce/schema/Order.ServiceEndSub_Reasons__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
-import updateMilestone1Task from '@salesforce/apex/SOFDisconnectPanelController.updateMilestone1Task';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
@@ -57,23 +44,11 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.Disconnect_Request_Received_Date__c',
         'Order.End_Reason_Notes__c',
         'Order.Equipment_Pickup_Needed__c',
+        'Order.Has_Successor__c',
         'Order.Proceed_with_Disconnect__c',
         'Order.Service_End_Reasons__c',
         'Order.ServiceEndSub_Reasons__c',
     ];
-    // fields = [
-    //     DISCO_CONTACT,
-    //     DISO_REQ_RECIEVED_DATE,
-    //     CONTRACT_STATUS,
-    //     CUST_REQ_DISCO_DATE,
-    //     END_REASON_NOTES,
-    //     EQUIP_PICKUP_FOR_DISCO,
-    //     PROCEED_DISCO,
-    //     SERVICE_END_REASON,
-    //     STATUS,
-    //     SUB_REASONS,
-    //     DISCO_CONTACT_FULLNAME
-    // ];
 
     @wire( getRecord, { recordId: '$recordId', fields:'$fields' } )
     getRecordData( { error, data } ) {
@@ -84,6 +59,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.record = data;
             this.useNewTable = true;
             this.sofStatus = this.record.fields.Status.value;
+            this.hasChildSOF = this.record.fields.Has_Successor__c.value;
             this.contractStatus = this.record.fields.Service_End_Reason__c.value;
             this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
             this.discoContact = this.record.fields.Disconnect_Contact__c.value;
@@ -119,57 +95,55 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     // funtion for the disconnect button
     initiateDisconnect() {
-        if ( this.selectedDate == '' || this.selectedDate == null ) {
-            this.showToast( 'You must select a date', 'There must be a customer requested disconnect date', 'warning' );
+        
+        this.isLoading = true;
+        const fields = {};
+        const outputID = this.recordId;
+        fields.Id = this.recordId;
+        fields.Status = 'Disconnect in Progress';
+        fields.Service_End_Reason__c = 'Draft';
+        // Format the selected date to 'YYYY-MM-DD'
+        let date = new Date( this.selectedDate );
+        let formattedDate = date.toISOString().split( 'T' )[ 0 ];
+        fields.Customer_Requested_Disconnect_Date__c = formattedDate;
+        const recordInput = { fields };
+        
+        if ( this.hasChildSOF ) {
+            this.isLoading = true;
+            setTimeout( () => {
+                initiateDisconnect( { recordId: outputID } )
+                    .then( result => {
+                        console.log( 'initiateDisconnect result', result );
+                        this.getTasks();
+                        this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
+                        this.isLoading = false;
+                    } )
+                    .catch( error => {
+                        console.log( 'initiateDisconnect error', error );
+                        this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
+                        this.isLoading = false;
+                    } );
+            }, 500 );
         } else {
             this.isLoading = true;
-            const fields = {};
-            const outputID = this.recordId;
-            fields.Id = this.recordId;
-            fields.Status = 'Disconnect in Progress';
-            fields.Service_End_Reason__c = 'Draft';
-            // Format the selected date to 'YYYY-MM-DD'
-            let date = new Date( this.selectedDate );
-            let formattedDate = date.toISOString().split( 'T' )[ 0 ];
-            fields.Customer_Requested_Disconnect_Date__c = formattedDate;
-            const recordInput = { fields };
             
-            if ( this.hasChildSOF ) {
-                this.isLoading = true;
-                setTimeout( () => {
-                    initiateDisconnect( { recordId: outputID } )
-                        .then( result => {
-                            console.log( 'initiateDisconnect result', result );
+                updateRecord( recordInput )
+                    .then( result => {
+                        setTimeout( () => {
+                            console.log( 'updateRecord result', result );
                             this.getTasks();
-                            this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
+                            this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
                             this.isLoading = false;
-                        } )
-                        .catch( error => {
-                            console.log( 'initiateDisconnect error', error );
-                            this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
-                            this.isLoading = false;
-                        } );
-                }, 5000 );
-            } else {
-                this.isLoading = true;
-                
-                    updateRecord( recordInput )
-                        .then( result => {
-                            setTimeout( () => {
-                                console.log( 'updateRecord result', result );
-                                this.getTasks();
-                                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-                                this.isLoading = false;
-                            }, 5000 );
-                        } )
-                        .catch( error => {
-                            console.log( 'updateRecord error', error );
-                            this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-                            this.isLoading = false;
-                        } );
-                
-            }
+                        }, 500 );
+                    } )
+                    .catch( error => {
+                        console.log( 'updateRecord error', error );
+                        this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                        this.isLoading = false;
+                    } );
+            
         }
+        
     }
     
     // function to get the tasks
