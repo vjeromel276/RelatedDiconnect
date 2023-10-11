@@ -3,7 +3,6 @@ import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
-import initiateDisconnect from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
@@ -31,9 +30,9 @@ export default class SOFDisconnectPanel extends LightningElement {
     proceedDisco = '';
     serviceEndReason = '';
     status = '';
-    subReasons = '';
-    
+    subReasons = '';    
     result;
+    
     fields = [
         'Order.Id',
         'Order.Status',
@@ -95,55 +94,28 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     // funtion for the disconnect button
     initiateDisconnect() {
-        
+        console.log( 'initiateDisconnect');
         this.isLoading = true;
         const fields = {};
-        const outputID = this.recordId;
         fields.Id = this.recordId;
         fields.Status = 'Disconnect in Progress';
         fields.Service_End_Reason__c = 'Draft';
-        // Format the selected date to 'YYYY-MM-DD'
-        let date = new Date( this.selectedDate );
-        let formattedDate = date.toISOString().split( 'T' )[ 0 ];
-        fields.Customer_Requested_Disconnect_Date__c = formattedDate;
         const recordInput = { fields };
         
-        if ( this.hasChildSOF ) {
-            this.isLoading = true;
-            setTimeout( () => {
-                initiateDisconnect( { recordId: outputID } )
-                    .then( result => {
-                        console.log( 'initiateDisconnect result', result );
-                        this.getTasks();
-                        this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
-                        this.isLoading = false;
-                    } )
-                    .catch( error => {
-                        console.log( 'initiateDisconnect error', error );
-                        this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
-                        this.isLoading = false;
-                    } );
-            }, 500 );
-        } else {
-            this.isLoading = true;
-            
-                updateRecord( recordInput )
-                    .then( result => {
-                        setTimeout( () => {
-                            console.log( 'updateRecord result', result );
-                            this.getTasks();
-                            this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-                            this.isLoading = false;
-                        }, 500 );
-                    } )
-                    .catch( error => {
-                        console.log( 'updateRecord error', error );
-                        this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-                        this.isLoading = false;
-                    } );
-            
-        }
-        
+        updateRecord( recordInput )
+            .then( result => {
+                setTimeout( () => {
+                    console.log( 'updateRecord result', result );
+                    this.getTasks();
+                    this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+                    this.isLoading = false;
+                }, 100 );
+            } )
+            .catch( error => {
+                console.log( 'updateRecord error', error );
+                this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                this.isLoading = false;
+            } );
     }
     
     // function to get the tasks
@@ -183,48 +155,9 @@ export default class SOFDisconnectPanel extends LightningElement {
             );
     }
 
-    //~ the new new way of doing the data table
-    // handleCheckboxChange(event) {
-    //     event.preventDefault();
-    //     this.isCheckboxLoading = true;
-        
-    //     const fields = {};
-    //     const checkBox = event.target.dataset.field;
-    //     const taskId = event.target.dataset.id;
-    //     const isChecked = event.target.checked;
+    
 
-    //     // Immediately update the local state
-    //     const taskIndex = this.taskData.findIndex(task => task.Id === taskId);
-    //     if (taskIndex !== -1) {
-    //         this.taskData[taskIndex][checkBox] = isChecked;
-    //     }
-        
-    //     // Prepare fields for update
-    //     if (checkBox === 'MPM4_BASE__Complete__c') {
-    //         fields.Id = taskId;
-    //         fields.MPM4_BASE__Complete__c = isChecked;
-    //     } else if (checkBox === 'Not_Applicable__c') {
-    //         fields.Id = taskId;
-    //         fields.Not_Applicable__c = isChecked;
-    //     }
-
-    //     const recordInput = { fields };
-    //         this.retryUpdateRecord( recordInput )
-    //             .then( result => {
-    //                 this.isCheckboxLoading = false;
-    //                 this.showToast( 'Record Updated', 'The record has been updated.', 'brand' );
-    //                 this.getTasks();
-    //             } )
-    //             .catch( error => {
-    //                 // Revert local state change if update fails
-    //                 if ( taskIndex !== -1 ) {
-    //                     this.taskData[ taskIndex ][ checkBox ] = !isChecked;
-    //                 }
-    //                 this.isCheckboxLoading = false;
-    //                 this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-    //                 this.getTasks();
-    //             } );
-    // }
+   
 
     
     //~ old new way of doing the data table
@@ -271,90 +204,10 @@ export default class SOFDisconnectPanel extends LightningElement {
         // }
         
     }
-    //& Commented out this is for the old sale
-    // handleRowAction( event ) {
-    //     const actionName = event.detail.action.name;
-    //     const row = event.detail.row;
-    //     switch (actionName) {
-    //         case 'view_details':
-    //             this[ NavigationMixin.Navigate ]( {
-    //                 type: 'standard__recordPage',
-    //                 attributes: {
-    //                     recordId: row.Id,
-    //                     actionName: 'view'
-    //                 }
-    //             }, true ); // Set true to open in a new tab, false to open in the same tab
-    //             break;
-    //         default:
-    //     }
-    // }
+   
 
-    // onCellChange( event ) {
-    //     console.log( 'event.detail.draftValues', event.detail.draftValues[0] );
-    //     this.draftValues = event.detail.draftValues;
-    //      // Loop through each draft value
-    //     this.draftValues.forEach( draft => {
-    //         // Find the index of the task in the taskData array that has the same Id as the draft
-    //         let index = this.taskData.findIndex( task => task.Id === draft.Id );
-
-    //         // If a task with the same Id is found, update it with the draft values
-    //         if ( index !== -1 ) {
-    //             this.taskData[ index ] = { ...this.taskData[ index ], ...draft };
-    //         }
-    //         this.isLoading = true;
-    //     } );
-            
-    //     // console.log( 'this.taskData', this.taskData );
-    //     this.draftValues = [];
-    //     this.taskData = [ ...this.taskData ];
-    //     this.hasTasks = true;
-    //     this.isLoading = false;
-    // }
     
-    // updateTasks( event ) {
-    //     event.preventDefault();
-        
-    //     setTimeout( () => {
-        
-    //         const records = JSON.stringify( JSON.parse( JSON.stringify( this.taskData ) ) );
-    //         console.log( 'taskRecords', records );
-    //         this.isLoading = true;
-    //         updateMilestone1Tasks( { tasks: records } )
-    //             .then( result => {
-    //                 console.log( 'updateMilestone1Tasks result', result );
-    //                 this.getTasks();
-    //                 this.hasTasks = false;
-    //                 const evt = new ShowToastEvent( {
-    //                     title: 'Milestone1 Tasks Updated',
-    //                     message: 'The record has been updated.',
-    //                     variant: 'brand',
-    //                 } );
-    //                 this.dispatchEvent( evt );
-    //                 this.isLoading = false;
-    //             } )
-    //             .catch( error => {
-    //                 console.log( 'updateMilestone1Tasks error', error );
-    //                 this.hasTasks = false;
-    //                 const evt = new ShowToastEvent( {
-    //                     title: 'Milestone1 Tasks Update Failed',
-    //                     message: 'The record has not been updated. Try again.',
-    //                     variant: 'error',
-    //                 } );
-    //                 this.dispatchEvent( evt );
-    //                 this.getTasks();
-    //                 this.isLoading = false;
-    //             } );
-    //     }, 100 );
-    // }
 
-    // handleCancel(event) {
-    //     event.preventDefault();
-    //     this.getTasks();
-    //     this.draftValues = [];
-    //     this.hasTasks = false;
-    //     this.isLoading = false;
-    // }
-    //& End of old data table handlers 
 
     retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
         this.isCheckboxLoading = true;  // Start loading
