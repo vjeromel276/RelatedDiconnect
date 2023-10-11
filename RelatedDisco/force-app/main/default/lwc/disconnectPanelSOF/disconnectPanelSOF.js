@@ -119,55 +119,57 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     // funtion for the disconnect button
     initiateDisconnect() {
-        
-        this.isLoading = true;
-        const fields = {};
-        const outputID = this.recordId;
-        fields.Id = this.recordId;
-        fields.Status = 'Disconnect in Progress';
-        fields.Service_End_Reason__c = 'Draft';
-        // Format the selected date to 'YYYY-MM-DD'
-        let date = new Date( this.selectedDate );
-        let formattedDate = date.toISOString().split( 'T' )[ 0 ];
-        fields.Customer_Requested_Disconnect_Date__c = formattedDate;
-        const recordInput = { fields };
-        
-        if ( this.hasChildSOF ) {
-            this.isLoading = true;
-            setTimeout( () => {
-                initiateDisconnect( { recordId: outputID } )
-                    .then( result => {
-                        console.log( 'initiateDisconnect result', result );
-                        this.getTasks();
-                        this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
-                        this.isLoading = false;
-                    } )
-                    .catch( error => {
-                        console.log( 'initiateDisconnect error', error );
-                        this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
-                        this.isLoading = false;
-                    } );
-            }, 5000 );
+        if ( this.selectedDate == '' || this.selectedDate == null ) {
+            this.showToast( 'You must select a date', 'There must be a customer requested disconnect date', 'warning' );
         } else {
             this.isLoading = true;
+            const fields = {};
+            const outputID = this.recordId;
+            fields.Id = this.recordId;
+            fields.Status = 'Disconnect in Progress';
+            fields.Service_End_Reason__c = 'Draft';
+            // Format the selected date to 'YYYY-MM-DD'
+            let date = new Date( this.selectedDate );
+            let formattedDate = date.toISOString().split( 'T' )[ 0 ];
+            fields.Customer_Requested_Disconnect_Date__c = formattedDate;
+            const recordInput = { fields };
             
-            updateRecord( recordInput )
-                .then( result => {
-                    setTimeout( () => {
-                        console.log( 'updateRecord result', result );
-                        this.getTasks();
-                        this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-                        this.isLoading = false;
-                    }, 5000 );
-                } )
-                .catch( error => {
-                    console.log( 'updateRecord error', error );
-                    this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-                    this.isLoading = false;
-                } );
-            
+            if ( this.hasChildSOF ) {
+                this.isLoading = true;
+                setTimeout( () => {
+                    initiateDisconnect( { recordId: outputID } )
+                        .then( result => {
+                            console.log( 'initiateDisconnect result', result );
+                            this.getTasks();
+                            this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
+                            this.isLoading = false;
+                        } )
+                        .catch( error => {
+                            console.log( 'initiateDisconnect error', error );
+                            this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
+                            this.isLoading = false;
+                        } );
+                }, 5000 );
+            } else {
+                this.isLoading = true;
+                
+                    updateRecord( recordInput )
+                        .then( result => {
+                            setTimeout( () => {
+                                console.log( 'updateRecord result', result );
+                                this.getTasks();
+                                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+                                this.isLoading = false;
+                            }, 5000 );
+                        } )
+                        .catch( error => {
+                            console.log( 'updateRecord error', error );
+                            this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                            this.isLoading = false;
+                        } );
+                
+            }
         }
-        
     }
     
     // function to get the tasks
