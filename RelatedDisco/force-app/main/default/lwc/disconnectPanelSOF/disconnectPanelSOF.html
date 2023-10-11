@@ -9,54 +9,69 @@
                 size="large"
             ></lightning-spinner>
             <template if:false={isLoading}>
-<<<<<<< HEAD
                 <template if:true={isDiscoInProg}>
                     <div
                         class="slds-form"
                         role="list"
                     >
                         <div class="slds-form__row">
-=======
-                <div
-                    class="slds-form"
-                    role="list"
-                >
-                    <div class="slds-form__row">
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
->>>>>>> parent of bc5fe4a (updates minor)
                             <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">
-                                    Contract Status: </span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">
-                                        {contractStatus}
+                                class="slds-form__item"
+                                role="listitem"
+                            >
+                                <div
+                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">
+                                        Contract Status: </span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            {contractStatus}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="slds-form__item"
+                                role="listitem"
+                            >
+                                <div
+                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Disconnect Request Received Date</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            {discoReqRecievedDate}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
                         <div class="slds-form__row">
-=======
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
->>>>>>> parent of bc5fe4a (updates minor)
                             <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Disconnect Request Received Date</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">
-                                        {discoReqRecievedDate}
+                                class="slds-form__item"
+                                role="listitem"
+                            >
+                                <div
+                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Equipment Pickup Needed for Disconnect</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">{equipPickupForDisco}</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="slds-form__item"
+                                role="listitem"
+                            >
+                                <div
+                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Custom Requested Disconnect Date</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">{custReqDiscoDate}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -131,123 +146,8 @@
                 </template>
                 <br>
                 
-=======
-                    </div>
-                    <div class="slds-form__row">
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Equipment Pickup Needed for Disconnect</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">{equipPickupForDisco}</div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Custom Requested Disconnect Date</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">{custReqDiscoDate}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slds-form__row">
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Service End Reason</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">
-                                        {serviceEndReason}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Proceed With Disconnect</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">{proceedDisco}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slds-form__row">
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Sub-Reasons</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">{subReasons}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                <span class="slds-form-element__label">Disconnect Contact</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static">{discoContact}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slds-form__row">
-                        <div
-                            class="slds-form__item"
-                            role="listitem"
-                        >
-                            <div
-                                class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-form-element_1-col">
-                                <span class="slds-form-element__label">End Reasons Notes</span>
-                                <div class="slds-form-element__control">
-                                    <div class="slds-form-element__static slds-text-longform">{endReasonNotes}
-                                        <br />
-                                    </div>
-                                    <button
-                                        class="slds-button slds-button_icon"
-                                        title="Edit: End Reasons Notes"
-                                    >
-                                        <svg
-                                            class="slds-button__icon slds-button__icon_hint"
-                                            aria-hidden="true"
-                                        >
-                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#edit"></use>
-                                        </svg>
-                                        <span class="slds-assistive-text">Edit: End Reasons Notes</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <br>
-            <div class="slds-align_absolute-center"> <h3>Disconnect Task List</h3></div>
->>>>>>> parent of bc5fe4a (updates minor)
                 <template if:false={isDiscoInProg}>
-                    <lightning-card title="Disconnect Task List">
+                    <lightning-card >
                         <lightning-input
                             style="width: 300px;"
                             type="date"
@@ -262,6 +162,7 @@
                         onclick={initiateDisconnect}
                     ></lightning-button>
                 </template>
+
                 <template if:true={isDiscoInProg}>
                     <template if:true={isLoading}>
                         <lightning-spinner
@@ -355,7 +256,7 @@
     </template>
     <template if:true={tasksFetchError}>
         <div style="text-align: center; padding: 10px;">
-            <p>There was an issue retrieving tasks. Wait 5 min refresh if there is still an error file a ticket</p>
+            <p>The Disconnect Project is being generated.</p>
         </div>
     </template>
 </template>
