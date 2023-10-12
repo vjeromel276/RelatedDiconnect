@@ -92,7 +92,18 @@ export default class SOFDisconnectPanel extends LightningElement {
         { label: 'Not Needed', fieldName: 'Not_Applicable__c', type: 'boolean', editable: true },
     ];
 
-    // funtion for the disconnect button
+    /**
+     * initiateDisconnect()
+     * This function is used to initiate the disconnect process
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     * 
+     * @uses        updateRecord()                      To update the record
+     * @uses        showToast()                         To show a toast message
+     * @uses        getTasks()                          To get the tasks
+     * 
+     */
     initiateDisconnect() {
         console.log( 'initiateDisconnect');
         this.isLoading = true;
@@ -100,6 +111,13 @@ export default class SOFDisconnectPanel extends LightningElement {
         fields.Id = this.recordId;
         fields.Status = 'Disconnect in Progress';
         fields.Service_End_Reason__c = 'Draft';
+        // Format the selected date to 'YYYY-MM-DD'
+        if ( this.selectedDate != null ) {
+            let date = new Date( this.selectedDate );
+            let formattedDate = date.toISOString().split( 'T' )[ 0 ];
+            fields.Customer_Requested_Disconnect_Date__c = formattedDate;
+        }
+        
         const recordInput = { fields };
         
         updateRecord( recordInput )
@@ -118,7 +136,19 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
     }
     
-    // function to get the tasks
+    /**
+     * getTasks()
+     * This function is used to get the tasks
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     * 
+     * @uses        getTasks()                          To get the tasks
+     * @uses        showToast()                         To show a toast message
+     * 
+     * TODO: possibly add a retry function to retry the getTasks() function if it fails
+     * 
+     */
     getTasks() {
         this.isLoading = true;
         const outputID = this.recordId
@@ -127,8 +157,10 @@ export default class SOFDisconnectPanel extends LightningElement {
             .then( result => {
                 console.log( 'getTasks ' );
                 console.log( { result } );
-                this.result = result;
+                // this.result = result;
                 if ( result != null ) {
+                    //!LAST CHANGE
+                    this.result = result;
                     this.taskData = result.map( task => {
                         return {
                             ...task,

@@ -5,16 +5,20 @@
 
         <lightning-card title="Disconnection Panel">
 
-            <lightning-spinner
-                if:true={isLoading}
-                alternative-text="Loading"
-                size="large"
-            ></lightning-spinner>
+            <template if:true={isLoading}>
+
+                <div style="text-align: center; padding: 10px;">
+                    <p>Your request is processing.</p>
+                    <p>When Completed the 'Disconnect Task List' will be displayed.</p>
+                    <p>You can comeback or refresh this page in a few moments</p>
+                </div>
+
+            </template>
 
             <template if:false={isLoading}>
 
                 <template if:true={isDiscoInProg}>
-
+                    
                     <div
                         class="slds-form"
                         role="list"
@@ -156,7 +160,15 @@
                 <br>
 
                 <template if:false={isDiscoInProg}>
-
+                    <lightning-card>
+                        <lightning-input
+                            style="width: 300px;"
+                            type="date"
+                            label="Customer Requested Disconnect Date If Known"
+                            value={selectedDate}
+                            onchange={handleDateChange}
+                        ></lightning-input>
+                    </lightning-card>
                     <lightning-button
                         variant="brand"
                         label="Disconnect"
@@ -167,10 +179,13 @@
                 <template if:true={isDiscoInProg}>
 
                     <template if:true={isLoading}>
-                        <lightning-spinner
-                            alternative-text="Loading"
-                            size="large"
-                        ></lightning-spinner>
+                        <lightning-card>
+                            <div style="text-align: center; padding: 10px;">
+                                <p>Your request is processing has been started.</p>
+                                <p>When Completed the 'Disconnect Task List' will be displayed.</p>
+                                <p>Comeback to this page later or refresh this page in a few moments</p>
+                            </div>
+                        </lightning-card>
                     </template>
 
                     <template if:false={isLoading}>
@@ -228,7 +243,9 @@
                             </table>
 
                         </template>
+
                     </template>
+
                 </template>
 
             </template>
@@ -238,12 +255,21 @@
     </template>
 
     <template if:true={tasksFetchError}>
-        <div style="text-align: center; padding: 10px;">
-            <!-- <p>The disconnect process has been started.</p>
-            <p>Once the 'Disconnect' project is finished being created</p>
-            <p>the 'Disconnect Task List' will be displayed.</p> -->
-            <h1>Calvin SUCKS!!!!! what do you want for a message here </h1>
-        </div>
+        <lightning-card>
+            <div slot="actions">
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    variant="bare"
+                    onclick={refreshData}
+                ></lightning-button-icon>
+            </div>
+
+            <div style="text-align: center; padding: 10px;">
+                <p>Your request is processing.</p>
+                <p>When Completed the 'Disconnect Task List' will be displayed.</p>
+                <p>You can comeback or refresh this page in a few moments</p>
+            </div>
+        </lightning-card>
     </template>
 
 </template>
