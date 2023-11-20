@@ -2,7 +2,7 @@
  * @description       :
  * @author            : clabelle@everstream.net
  * @group             :
- * @last modified on  : 08-11-2023
+ * @last modified on  : 11-16-2023
  * @last modified by  : clabelle@everstream.net
  **/
 public without sharing class SOFDisconnectPanelController{
@@ -54,13 +54,43 @@ public without sharing class SOFDisconnectPanelController{
     }
 
     @AuraEnabled
-    public static Boolean initiateDisconnect(String recordId){
+    public static Boolean initiateDisconnect(String recordId){//need to also pull in the requested disconnect date into this method and save it below
         //public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
         System.debug('initiateDisconnect');
         Boolean isSuccess = false;
 
-        update new Order(Id = recordId, Status = 'Disconnect in Progress', Reported_Disconnect_Date__c = System.today());
-        //update new Order(Id = recordId, Status = 'Disconnect in Progress', Reported_Disconnect_Date__c = System.today(), Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate);
+        //get the SOF details to calculate out the ETL if applicable
+        Order o = [SELECT ID, Contract.Termination_Liability__c, Service_Order_Agreement_MRC_Amortized__c, Contract_End_Date_Est__c, 
+                   Billing_Start_Date__c, PDF_Document_Comments__c
+                   FROM Order WHERE ID = :recordId];
+        
+        if (o.Billing_Start_Date__c != NULL && o.Contract_End_Date_Est__c != NULL && o.Service_Order_Agreement_MRC_Amortized__c != NULL && o.Service_Order_Agreement_MRC_Amortized__c > 0) {
+            if (o.PDF_Document_Comments__c == NULL && o.Contract != NULL && o.Contract.Termination_Liability__c != NULL && o.Contract.Termination_Liability__c.equals('Standard')) {
+                if (o.Contract_End_Date_Est__c < System.today()) {
+                    Integer monthsLeft = System.today().monthsBetween(o.Contract_End_Date_Est__c);
+                    Decimal etl = monthsLeft * o.Service_Order_Agreement_MRC_Amortized__c;
+
+                    o.Quoted_ETF__c = etl;
+                }
+            }
+        }
+        
+        o.Status = 'Disconnect in Progress';
+        o.Reported_Disconnect_Date__c = System.today();
+        o.Disconnect_Date__c = System.today().addDays(30);
+
+        /*if (customerRequestedDiscoDate != NULL) {
+            o.Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate;
+        }*/
+
+        //if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
+            o.Disconnect_Date__c = System.today().addDays(30);
+        //} else {
+        //    o.Disconnect_Date__c = customerRequestedDiscoDate.addDays(30);
+        //}
+
+        update o;
+
         isSuccess = true;
 
         return isSuccess;
