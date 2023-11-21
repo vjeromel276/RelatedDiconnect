@@ -17,154 +17,6 @@
 
             <template if:false={isLoading}>
 
-                <!-- old form  -->
-                <template if:true={isLoading}>
-
-
-                    <div
-                        class="slds-form"
-                        role="list"
-                    >
-
-                        <div class="slds-form__row">
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">
-                                        Contract Status: </span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">
-                                            <a href={contractLink}> {contractStatus}</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Disconnect Request Received Date</span>
-                                    <div class="slds-form-element__control">
-                                        <lightning-formatted-date-time value={discoReqRecievedDate}>
-                                        </lightning-formatted-date-time>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="slds-form__row">
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Equipment Pickup Needed for Disconnect</span>
-                                    <div class="slds-form-element__control">
-                                        <!-- <div class="slds-form-element__static">{equipPickupForDisco}</div> -->
-                                        <lightning-input-field
-                                            field-name="Equipment_Pickup_Needed__c">{equipPickupForDisco}
-                                        </lightning-input-field>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Custom Requested Disconnect Date</span>
-                                    <div class="slds-form-element__control">
-                                        <lightning-formatted-date-time value={custReqDiscoDate}>
-                                        </lightning-formatted-date-time>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="slds-form__row">
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Service End Reason</span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">
-                                            {serviceEndReason}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Proceed With Disconnect</span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">{proceedDisco}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="slds-form__row">
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Sub-Reasons</span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">{subReasons}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
-                                    <span class="slds-form-element__label">Disconnect Contact</span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">{discoContact}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="slds-form__row">
-                            <div
-                                class="slds-form__item"
-                                role="listitem"
-                            >
-                                <div
-                                    class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-form-element_1-col">
-                                    <span class="slds-form-element__label">End Reasons Notes</span>
-                                    <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static slds-text-longform">{endReasonNotes}
-                                            <br />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </template>
-
                 <!-- new form -->
 
                 <template if:true={isDiscoInProg}>
@@ -217,7 +69,7 @@
                                     <div
                                         class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
                                         <lightning-input-field
-                                            id="equipPickupForDisco"
+                                            onchange={handleFormChange}
                                             field-name="Equipment_Pickup_Needed__c"
                                         ></lightning-input-field>
                                     </div>
@@ -229,7 +81,9 @@
                                     <div
                                         class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_stacked">
                                         <lightning-input-field
-                                            field-name="Customer_Requested_Disconnect_Date__c"></lightning-input-field>
+                                            onchange={handleFormChange}
+                                            field-name="Customer_Requested_Disconnect_Date__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                             </div>
@@ -241,7 +95,9 @@
                                 >
                                     <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                         <lightning-input-field
-                                            field-name="Service_End_Reasons__c"></lightning-input-field>
+                                            onchange={handleFormChange}
+                                            field-name="Service_End_Reasons__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                                 <div
@@ -250,7 +106,9 @@
                                 >
                                     <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                         <lightning-input-field
-                                            field-name="Proceed_with_Disconnect__c"></lightning-input-field>
+                                            onchange={handleFormChange}
+                                            field-name="Proceed_with_Disconnect__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +120,9 @@
                                 >
                                     <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                         <lightning-input-field
-                                            field-name="ServiceEndSub_Reasons__c"></lightning-input-field>
+                                            onchange={handleFormChange}
+                                            field-name="ServiceEndSub_Reasons__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                                 <div
@@ -271,7 +131,9 @@
                                 >
                                     <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                                         <lightning-input-field
-                                            field-name="Disconnect_Contact__c"></lightning-input-field>
+                                            onchange={handleFormChange}
+                                            field-name="Disconnect_Contact__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +145,10 @@
                                 >
                                     <div
                                         class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
-                                        <lightning-input-field field-name="End_Reason_Notes__c"></lightning-input-field>
+                                        <lightning-input-field
+                                            onchange={handleFormChange}
+                                            field-name="End_Reason_Notes__c"
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                             </div>

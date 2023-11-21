@@ -29,13 +29,14 @@ export default class SOFDisconnectPanel extends LightningElement {
     discoContactName = {};
     discoReqRecievedDate = '';
     endReasonNotes = '';
-    equipPickupForDisco = '';
+    @api equipPickupForDisco = '';
     proceedDisco = '';
     serviceEndReason = '';
     status = '';
     subReasons = '';    
     result;
     hasFormChanged = false;
+    formFieldChanges = {};
     
     fields = [
         'Order.Id',
@@ -54,6 +55,13 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.ServiceEndSub_Reasons__c',
     ];
 
+    get equipPickupForDiscoOptions() {
+        return [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+        ];
+    }
+    
     @wire( getRecord, { recordId: '$recordId', fields:'$fields' } )
     getRecordData( { error, data } ) {
         this.isLoading = true;
@@ -176,7 +184,6 @@ export default class SOFDisconnectPanel extends LightningElement {
                         };
                     } );
                     this.isDiscoInProg = true;
-                    this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
                     this.tasksFetchError = false;
                 } else {
                     this.isDiscoInProg = true;
@@ -193,13 +200,6 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
             );
     }
-
-    
-
-   
-
-    
-    //~ old new way of doing the data table
     handleCheckboxChange( event ) {
         event.preventDefault();
         this.isLoading = true;
@@ -243,11 +243,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         // }
         
     }
-   
-
-    
-
-
     retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
         this.isCheckboxLoading = true;  // Start loading
         while ( retries > 0 ) {
@@ -273,27 +268,87 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
         this.isCheckboxLoading = false;  // End loading
     }
-    
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
     }
 
+        
+
     handleFormChange( e ) {
         e.preventDefault();
-        console.log('form changed', this.hasFormChanged);
-        this.hasFormChanged = true;
-        console.log('form changed', this.hasFormChanged);      
+        if ( e.target.fieldName === 'Equipment_Pickup_Needed__c' ) {
+            this.equipPickupForDisco = e.target.value;
+            console.log(this.equipPickupForDisco);
+        } else if ( e.target.fieldName === 'Customer_Requested_Disconnect_Date__c' ) {
+            this.selectedDate = e.target.value;
+            console.log(this.selectedDate);
+        } else if ( e.target.fieldName === 'Service_End_Reasons__c' ) {
+            this.serviceEndReason = e.target.value;
+            console.log(this.serviceEndReason);
+        } else if ( e.target.fieldName === 'ServiceEndSub_Reasons__c' ) {
+            this.subReasons = e.target.value;
+            console.log(this.subReasons);
+        } else if ( e.target.fieldName === 'Proceed_with_Disconnect__c' ) {
+            this.proceedDisco = e.target.value;
+            console.log(this.proceedDisco);
+        } else if ( e.target.fieldName === 'End_Reason_Notes__c' ) {
+            this.endReasonNotes = e.target.value;
+            console.log(this.endReasonNotes);
+        } else if ( e.target.fieldName === 'Disconnect_Contact__c' ) {
+            this.discoContact = e.target.value;
+            console.log(this.discoContact);
+        }
+        const formFields = {};
+        formFields.Id = this.recordId;
+        formFields.Equipment_Pickup_Needed__c = this.equipPickupForDisco;
+        formFields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
+        formFields.Service_End_Reasons__c = this.serviceEndReason;
+        formFields.ServiceEndSub_Reasons__c = this.subReasons;
+        formFields.Proceed_with_Disconnect__c = this.proceedDisco;
+        formFields.End_Reason_Notes__c = this.endReasonNotes;
+        formFields.Disconnect_Contact__c = this.discoContact;
+        this.formFieldChanges = {formFields};
+        this.hasFormChanged = true;     
+    }
+
+     /**
+     * updateDisconnect()
+     * 
+     */
+    updateDisconnect() {
+        console.log( 'updateDisconnect');
+        this.isLoading = true;
+        this.hasFormChanged = false;
+        const recordInput = {formFieldChanges};
+        // console.log( 'recordInput', recordInput );
+        
+        updateRecord( recordInput )
+            .then( result => {
+                setTimeout( () => {
+                    console.log( 'updateRecord result', result );
+                    this.getTasks();
+                    this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+                    this.isLoading = false;
+                }, 100 );
+            } )
+            .catch( error => {
+                console.log( 'updateRecord error', error );
+                this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+                this.isLoading = false;
+            } );
     }
 
     handleFormUpdate( e ) {
-        this.initiateDisconnect();
+        e.preventDefault();
         this.hasFormChanged = false;
+        this.updateDisconnect();
     }
 
     handleFormCancel( e ) {
-        e.preventDefault();
+        // e.preventDefault();
         this.hasFormChanged = false;
+        this.getRecordData();
     }
 
     // toast message helper function
