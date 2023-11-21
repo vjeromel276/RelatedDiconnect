@@ -6,6 +6,7 @@ import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
+    objectApiName = 'Order';
     @api hasChildSOF= false;
     draftValues = [];
     @track taskData = [];
@@ -21,6 +22,8 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track useNewTable = false;
     @track isCheckboxLoading = false;
     contractStatus = '';
+    contract = {};
+    contractLink=`https://everstream--uat.sandbox.lightning.force.com/lightning/r/Contract/${this.contract}/view`
     custReqDiscoDate = '';
     discoContact = [];
     discoContactName = {};
@@ -32,10 +35,12 @@ export default class SOFDisconnectPanel extends LightningElement {
     status = '';
     subReasons = '';    
     result;
+    hasFormChanged = false;
     
     fields = [
         'Order.Id',
         'Order.Status',
+        'Order.ContractId',
         'Order.Service_End_Reason__c',
         'Order.Customer_Requested_Disconnect_Date__c',
         'Order.Disconnect_Contact__c',
@@ -60,6 +65,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.sofStatus = this.record.fields.Status.value;
             this.hasChildSOF = this.record.fields.Has_Successor__c.value;
             this.contractStatus = this.record.fields.Service_End_Reason__c.value;
+            this.contract = this.record.fields.ContractId.value;
             this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
             this.discoContact = this.record.fields.Disconnect_Contact__c.value;
             this.discoContactName = this.record.fields.Disconnect_Contact__r.value;
@@ -72,6 +78,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
             console.log( 'this.sofStatus', this.sofStatus );
             console.log( 'this.contractStatus', this.contractStatus );
+            console.log( 'this.contract', this.contract );
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
             console.log( 'this.discoContact', this.discoContact );
                         
@@ -270,6 +277,23 @@ export default class SOFDisconnectPanel extends LightningElement {
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
+    }
+
+    handleFormChange( e ) {
+        e.preventDefault();
+        console.log('form changed', this.hasFormChanged);
+        this.hasFormChanged = true;
+        console.log('form changed', this.hasFormChanged);      
+    }
+
+    handleFormUpdate( e ) {
+        this.initiateDisconnect();
+        this.hasFormChanged = false;
+    }
+
+    handleFormCancel( e ) {
+        e.preventDefault();
+        this.hasFormChanged = false;
     }
 
     // toast message helper function

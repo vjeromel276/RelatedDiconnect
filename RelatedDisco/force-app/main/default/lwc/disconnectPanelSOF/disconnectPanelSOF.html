@@ -3,7 +3,7 @@
 <template>
     <template if:false={tasksFetchError}>
 
-        <lightning-card title="Disconnection Panel">
+        <lightning-card>
 
             <template if:true={isLoading}>
 
@@ -17,8 +17,10 @@
 
             <template if:false={isLoading}>
 
-                <template if:true={isDiscoInProg}>
-                    
+                <!-- old form  -->
+                <template if:true={isLoading}>
+
+
                     <div
                         class="slds-form"
                         role="list"
@@ -35,7 +37,7 @@
                                         Contract Status: </span>
                                     <div class="slds-form-element__control">
                                         <div class="slds-form-element__static">
-                                            {contractStatus}
+                                            <a href={contractLink}> {contractStatus}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -54,6 +56,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -63,8 +66,10 @@
                                     class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
                                     <span class="slds-form-element__label">Equipment Pickup Needed for Disconnect</span>
                                     <div class="slds-form-element__control">
-                                        <div class="slds-form-element__static">{equipPickupForDisco}</div>
-
+                                        <!-- <div class="slds-form-element__static">{equipPickupForDisco}</div> -->
+                                        <lightning-input-field
+                                            field-name="Equipment_Pickup_Needed__c">{equipPickupForDisco}
+                                        </lightning-input-field>
                                     </div>
                                 </div>
                             </div>
@@ -82,6 +87,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -110,6 +116,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -136,6 +143,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="slds-form__row">
                             <div
                                 class="slds-form__item"
@@ -155,6 +163,159 @@
 
                     </div>
 
+                </template>
+
+                <!-- new form -->
+
+                <template if:true={isDiscoInProg}>
+                    <lightning-record-edit-form
+                        object-api-name={objectApiName}
+                        record-id={recordId}
+                    >
+
+                        <div
+                            class="slds-form"
+                            role="list"
+                            onchange={handleFormChange}
+                        >
+
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked">
+
+                                        <lightning-output-field
+                                            class="slds-form-element__static is-read-only"
+                                            field-name="Service_End_Reason__c"
+                                        >
+                                            <a href={contractLink}>Contract Link</a>
+                                        </lightning-output-field>
+                                    </div>
+                                </div>
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked ">
+                                        <lightning-output-field
+                                            class="slds-form-element__static is-read-only"
+                                            field-name="Disconnect_Request_Received_Date__c"
+                                        ></lightning-output-field>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
+                                        <lightning-input-field
+                                            id="equipPickupForDisco"
+                                            field-name="Equipment_Pickup_Needed__c"
+                                        ></lightning-input-field>
+                                    </div>
+                                </div>
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_stacked">
+                                        <lightning-input-field
+                                            field-name="Customer_Requested_Disconnect_Date__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                        <lightning-input-field
+                                            field-name="Service_End_Reasons__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                        <lightning-input-field
+                                            field-name="Proceed_with_Disconnect__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                        <lightning-input-field
+                                            field-name="ServiceEndSub_Reasons__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                                        <lightning-input-field
+                                            field-name="Disconnect_Contact__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
+                                        <lightning-input-field field-name="End_Reason_Notes__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <template if:true={hasFormChanged}>
+                                <lightning-button-group>
+                                    <lightning-button
+                                        class="slds-m-top_small"
+                                        variant="variant"
+                                        type="submit"
+                                        name="update"
+                                        label="Update"
+                                        onclick={handleFormUpdate}
+                                    >
+                                    </lightning-button>
+                                    <lightning-button
+                                        class="slds-m-top_small"
+                                        variant="brand"
+                                        type="reset"
+                                        name="cancel"
+                                        label="Cancel"
+                                        onclick={handleFormCancel}
+                                    >
+                                    </lightning-button>
+                                </lightning-button-group>
+                            </template>
+
+                        </div>
+
+
+
+                    </lightning-record-edit-form>
                 </template>
 
                 <br>
