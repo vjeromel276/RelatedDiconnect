@@ -273,8 +273,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         console.log( 'selectedDate', this.selectedDate );
     }
 
-        
-
     handleFormChange( e ) {
         e.preventDefault();
         console.log('Field Name', e.target.fieldName);
@@ -313,14 +311,12 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.hasFormChanged = true;     
     }
 
-
     handleUpdateButton( e ) {
         e.preventDefault();
         this.hasFormChanged = false;
     }
 
-    handleCancelButton(e) { 
-        this.hasFormChanged = false;
+    handleCancelButton( e ) { 
         const inputFields = this.template.querySelectorAll(
             'lightning-input-field'
         );
@@ -330,7 +326,9 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
-
+    hideButtons() {
+        this.hasFormChanged = false;
+    }
     // toast message helper function
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
