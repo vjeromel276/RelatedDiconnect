@@ -277,6 +277,7 @@ export default class SOFDisconnectPanel extends LightningElement {
 
     handleFormChange( e ) {
         e.preventDefault();
+        console.log('Field Name', e.target.fieldName);
         if ( e.target.fieldName === 'Equipment_Pickup_Needed__c' ) {
             this.equipPickupForDisco = e.target.value;
             console.log(this.equipPickupForDisco);
@@ -318,34 +319,35 @@ export default class SOFDisconnectPanel extends LightningElement {
      */
     updateDisconnect() {
         console.log( 'updateDisconnect');
-        this.isLoading = true;
+        // this.isLoading = true;
         this.hasFormChanged = false;
-        const recordInput = {formFieldChanges};
+        const formFieldChanges = this.formFieldChanges;
+        const recordInput = { formFieldChanges };
+        console.log( 'formFieldChanges', JSON.stringify( formFieldChanges ));
         // console.log( 'recordInput', recordInput );
         
-        updateRecord( recordInput )
-            .then( result => {
-                setTimeout( () => {
-                    console.log( 'updateRecord result', result );
-                    this.getTasks();
-                    this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-                    this.isLoading = false;
-                }, 100 );
-            } )
-            .catch( error => {
-                console.log( 'updateRecord error', error );
-                this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-                this.isLoading = false;
-            } );
+        // updateRecord( recordInput )
+        //     .then( result => {
+        //         setTimeout( () => {
+        //             console.log( 'updateRecord result', result );
+        //             this.getTasks();
+        //             this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+        //             this.isLoading = false;
+        //         }, 100 );
+        //     } )
+        //     .catch( error => {
+        //         console.log( 'updateRecord error', error );
+        //         this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+        //         this.isLoading = false;
+        //     } );
     }
 
-    handleFormUpdate( e ) {
+    handleUpdateButton( e ) {
         e.preventDefault();
-        this.hasFormChanged = false;
         this.updateDisconnect();
     }
 
-    handleFormCancel( e ) {
+    handleCancelButton( e ) {
         // e.preventDefault();
         this.hasFormChanged = false;
         this.getRecordData();
