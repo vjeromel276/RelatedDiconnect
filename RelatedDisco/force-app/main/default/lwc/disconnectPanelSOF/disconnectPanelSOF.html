@@ -28,7 +28,6 @@
                         <div
                             class="slds-form"
                             role="list"
-                            onchange={handleFormChange}
                         >
 
                             <div class="slds-form__row">
@@ -71,6 +70,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Equipment_Pickup_Needed__c"
+                                            value={equipmentPickupNeeded}
                                         ></lightning-input-field>
                                     </div>
                                 </div>
@@ -83,6 +83,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Customer_Requested_Disconnect_Date__c"
+                                            value={selectedDate}
                                         ></lightning-input-field>
                                     </div>
                                 </div>
@@ -97,6 +98,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Service_End_Reasons__c"
+                                            value={serviceEndReasons}
                                         ></lightning-input-field>
                                     </div>
                                 </div>
@@ -108,6 +110,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Proceed_with_Disconnect__c"
+                                            value={proceedWithDisconnect}
                                         ></lightning-input-field>
                                     </div>
                                 </div>
@@ -122,6 +125,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="ServiceEndSub_Reasons__c"
+                                            value={serviceEndSubReasons}
                                         ></lightning-input-field>
                                     </div>
                                 </div>
@@ -133,6 +137,7 @@
                                         <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Disconnect_Contact__c"
+                                            value={disconnectContact}
                                         ></lightning-input-field>
                                     </div>
                                 </div>

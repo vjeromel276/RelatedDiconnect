@@ -1,5 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
-import { getRecord, updateRecord } from 'lightning/uiRecordApi';
+import { getRecord, reload, updateRecord } from 'lightning/uiRecordApi';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
@@ -25,15 +25,15 @@ export default class SOFDisconnectPanel extends LightningElement {
     contract = {};
     contractLink=`https://everstream--uat.sandbox.lightning.force.com/lightning/r/Contract/${this.contract}/view`
     custReqDiscoDate = '';
-    discoContact = [];
-    discoContactName = {};
+    @track discoContact = [];
+    @track discoContactName = {};
     discoReqRecievedDate = '';
     endReasonNotes = '';
-    @api equipPickupForDisco = '';
-    proceedDisco = '';
-    serviceEndReason = '';
-    status = '';
-    subReasons = '';    
+    @track equipPickupForDisco = '';
+    @track proceedDisco = '';
+    @track serviceEndReason = '';
+    @track status = '';
+    @track subReasons = '';    
     result;
     hasFormChanged = false;
     formFieldChanges = {};
@@ -313,44 +313,22 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.hasFormChanged = true;     
     }
 
-     /**
-     * updateDisconnect()
-     * 
-     */
-    updateDisconnect() {
-        console.log( 'updateDisconnect');
-        // this.isLoading = true;
-        this.hasFormChanged = false;
-        const formFieldChanges = this.formFieldChanges;
-        const recordInput = { formFieldChanges };
-        console.log( 'formFieldChanges', JSON.stringify( formFieldChanges ));
-        // console.log( 'recordInput', recordInput );
-        
-        // updateRecord( recordInput )
-        //     .then( result => {
-        //         setTimeout( () => {
-        //             console.log( 'updateRecord result', result );
-        //             this.getTasks();
-        //             this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-        //             this.isLoading = false;
-        //         }, 100 );
-        //     } )
-        //     .catch( error => {
-        //         console.log( 'updateRecord error', error );
-        //         this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-        //         this.isLoading = false;
-        //     } );
-    }
 
     handleUpdateButton( e ) {
         e.preventDefault();
-        this.updateDisconnect();
+        this.hasFormChanged = false;
     }
 
-    handleCancelButton( e ) {
-        // e.preventDefault();
+    handleCancelButton(e) { 
         this.hasFormChanged = false;
-        this.getRecordData();
+        const inputFields = this.template.querySelectorAll(
+            'lightning-input-field'
+        );
+        if (inputFields) {
+            inputFields.forEach( field => {
+                field.reset();
+            } );
+        }
     }
 
     // toast message helper function
