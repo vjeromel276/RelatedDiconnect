@@ -38,6 +38,14 @@ export default class SOFDisconnectPanel extends LightningElement {
     hasFormChanged = false;
     formFieldChanges = {};
     
+    /**
+     * fields
+     * This is an array of fields to get from the record
+     * 
+     * @type        {array}
+     * 
+     * @see         https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_record
+     */
     fields = [
         'Order.Id',
         'Order.Status',
@@ -55,6 +63,15 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.ServiceEndSub_Reasons__c',
     ];
 
+    /**
+     * get equipPickupForDiscoOptions()
+     * This function is used to get the equipment pickup for disconnect options
+     * 
+     * @return      {array}                             The equipment pickup for disconnect options
+     * 
+     * @uses        getRecord()                         To get the record
+     * 
+     */
     get equipPickupForDiscoOptions() {
         return [
             { label: 'Yes', value: 'Yes' },
@@ -200,6 +217,18 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
             );
     }
+
+    /**
+     * handleCheckboxChange()
+     * This function is used to handle the checkbox change
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     * 
+     * @uses        updateRecord()                      To update the record
+     * @uses        showToast()                         To show a toast message
+     * @uses        getTasks()                          To get the tasks
+     */
     handleCheckboxChange( event ) {
         event.preventDefault();
         this.isLoading = true;
@@ -243,6 +272,16 @@ export default class SOFDisconnectPanel extends LightningElement {
         // }
         
     }
+
+    /**
+     * retryUpdateRecord()
+     * This function is used to retry the updateRecord() function if it fails
+     * 
+     * @param       {object}            recordInput     The record input
+     * @param       {integer}           retries         The number of retries
+     * @param       {integer}           delay           The delay in seconds
+     * @return      {object}                            The result
+     */
     retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
         this.isCheckboxLoading = true;  // Start loading
         while ( retries > 0 ) {
@@ -268,11 +307,26 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
         this.isCheckboxLoading = false;  // End loading
     }
+
+    /**
+     * handleDateChange()
+     * This function is used to handle the date change
+     *  
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     */
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
     }
 
+    /**
+     * handleReasonChange()
+     * This function is used to handle the reason change
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     */
     handleFormChange( e ) {
         e.preventDefault();
         console.log('Field Name', e.target.fieldName);
@@ -311,11 +365,25 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.hasFormChanged = true;     
     }
 
+    /**
+     * handleUpdateButton()
+     * This function is used to handle the update button
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     */
     handleUpdateButton( e ) {
         e.preventDefault();
         this.hasFormChanged = false;
     }
 
+    /**
+     * handleCancelButton()
+     * This function is used to handle the cancel button
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     */
     handleCancelButton( e ) { 
         const inputFields = this.template.querySelectorAll(
             'lightning-input-field'
@@ -326,10 +394,28 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
+
+    /**
+     * handleSaveButton()
+     * This function is used to handle the save button
+     * 
+     * @param       {object}            event           The event object
+     * @return      {void}                              This function doesn't return anything
+     */
     hideButtons() {
         this.hasFormChanged = false;
     }
-    // toast message helper function
+    
+    /**
+     * showToast()
+     * This function is used to show a toast message
+     * 
+     * @param       {string}            title           The toast title
+     * @param       {string}            message         The toast message
+     * @param       {string}            variant         The toast variant
+     * 
+     * @return      {void}                              This function doesn't return anything
+     */
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
             title: title,
