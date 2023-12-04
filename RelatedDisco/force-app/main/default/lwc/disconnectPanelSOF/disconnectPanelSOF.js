@@ -188,7 +188,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         getTasks( { recordId: outputID } )
             .then( result => {
                 console.log( 'getTasks ' );
-                // console.log( { result } );
+                console.log( { result } );
                 // this.result = result;
                 if ( result != null ) {
                     //!LAST CHANGE
