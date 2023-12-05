@@ -23,9 +23,10 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track useNewTable = false;
     @track isCheckboxLoading = false;
     contractStatus = '';
-    @track contractId = '';
-    // contract = {};
+    @api contractId = '';
+    contractData = {};
     contractLink;
+    @track contractNumber = '';
     custReqDiscoDate = '';
     @track discoContact = [];
     @track discoContactName = {};
@@ -63,6 +64,12 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.Proceed_with_Disconnect__c',
         'Order.Service_End_Reasons__c',
         'Order.ServiceEndSub_Reasons__c',
+    ];
+    
+    fields2 = [
+        'Contract.Id',
+        'Contract.Termination_Liability__c',
+        'Contract.ContractNumber',
     ];
 
     get equipPickupForDiscoOptions() {
@@ -106,16 +113,63 @@ export default class SOFDisconnectPanel extends LightningElement {
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
             console.log( 'this.disconnectDate', this.disconnectDate );
             console.log( 'this.discoContact', this.discoContact );
-            // console.log( 'this.termLiab', this.terminationLiability );
+            
             
             // can add multiple if statements to check for different statuses
             if( this.sofStatus == 'Disconnect in Progress' ) {
                 this.getTasks();
             }
+            
         } else if ( error ) {
             console.log( 'error', error );
         }
     }
+
+    @wire( getRecord, { recordId: '$contractId', fields:'$fields2' } )
+    getContractData( { error, data } ) {
+        this.isLoading = true;
+        if ( data ) {
+            this.isLoading = false;
+            console.log( 'data', data );
+            this.contractData = data;
+            this.terminationLiability = this.contractData.fields.Termination_Liability__c.value;
+            this.contractNumber = this.contractData.fields.ContractNumber.value;
+            console.log( 'this.termLiab', this.terminationLiability );
+            // if ( this.terminationLiability != 'Standard' && this.terminationLiability != null
+            //     && this.contractId != '' ) {
+            //     //  Integer monthsLeft = System.today().monthsBetween(o.Contract_End_Date_Est__c);
+            //     let monthsLeft = this.getMonthsDifference( this.record.fields.Contract_End_Date_Est__c.value );
+            //     //     Decimal etl = monthsLeft * o.Service_Order_Agreement_MRC_Amortized__c;
+            //     let etl = monthsLeft * this.record.fields.Service_Order_Agreement_MRC_Amortized__c.value;
+            //     //     o.Quoted_ETF__c = etl;
+                
+            // }
+        } else if ( error ) {
+            console.log( 'error', error );
+        }
+    }
+
+    getMonthsDifference(otherDate) {
+        // Today's date
+        const today = new Date();
+
+        // Parsing the other date
+        // Assuming otherDate is in a format that can be directly used to create a Date object
+        const other = new Date(otherDate);
+
+        // Calculating the year and month difference
+        const yearsDifference = today.getFullYear() - other.getFullYear();
+        const monthsDifference = today.getMonth() - other.getMonth();
+
+        // Total difference in months
+        const totalMonthsDifference = yearsDifference * 12 + monthsDifference;
+
+        // If you need to account for days (e.g., half months), you can further calculate the day difference
+        // and adjust the totalMonthsDifference accordingly.
+
+        return totalMonthsDifference;
+    }
+    
 
     columns = [
         { label: 'Milestone Name', fieldName: 'Milestone_Name__c', type: 'text' },

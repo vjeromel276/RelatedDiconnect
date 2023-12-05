@@ -43,7 +43,7 @@
                                             class="slds-form-element__static is-read-only"
                                             field-name="Service_End_Reason__c"
                                         >
-                                            <a href={contractLink}>Contract Link</a>
+                                            <a href={contractLink} ><p>{contract}</p></a>
                                         </lightning-output-field>
                                     </div>
                                 </div>
@@ -66,13 +66,15 @@
                                     class="slds-form__item"
                                     role="listitem"
                                 >
-                                    <div
-                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
-                                        <lightning-input-field
-                                            onchange={handleFormChange}
-                                            field-name="Equipment_Pickup_Needed__c"
-                                            value={equipmentPickupNeeded}
-                                        ></lightning-input-field>
+                                    <div class="slds-form-element slds-form-element_horizontal slds-form-element_stacked">
+                                    
+                                        <lightning-output-field
+                                            class="slds-form-element__static is-read-only"
+                                        >
+                                            <a href={contractLink}>
+                                                <p>{contract}</p>
+                                            </a>
+                                        </lightning-output-field>
                                     </div>
                                 </div>
                                 <div
@@ -89,18 +91,18 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="slds-form__row">
                                 <div
                                     class="slds-form__item"
                                     role="listitem"
                                 >
-                                    <div
-                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
-                                        <!-- <lightning-input-field
+                                    <div class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
+                                        <lightning-input-field
                                             onchange={handleFormChange}
                                             field-name="Equipment_Pickup_Needed__c"
                                             value={equipmentPickupNeeded}
-                                        ></lightning-input-field> -->
+                                        ></lightning-input-field>
                                     </div>
                                 </div>
                                 <div
