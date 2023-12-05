@@ -24,7 +24,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track isCheckboxLoading = false;
     contractStatus = '';
     @track contractId = '';
-    contract = '';
+    // contract = {};
     contractLink;
     custReqDiscoDate = '';
     @track discoContact = [];
@@ -39,12 +39,19 @@ export default class SOFDisconnectPanel extends LightningElement {
     result;
     hasFormChanged = false;
     formFieldChanges = {};
+    terminationLiability = '';
     
     fields = [
         'Order.Id',
         'Order.Status',
         'Order.ContractId',
         'Order.Disconnect_Date__c',
+        // 'Order.Contract',
+        'Order.Billing_Start_Date__c',
+        'Order.Contract_End_Date_Est__c',
+        'Order.Service_Order_Agreement_MRC_Amortized__c',
+        'Order.PDF_Document_Comments__c',
+        // 'Order.Contract.Termination_Liability__c',
         'Order.Service_End_Reason__c',
         'Order.Customer_Requested_Disconnect_Date__c',
         'Order.Disconnect_Contact__c',
@@ -77,6 +84,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.hasChildSOF = this.record.fields.Has_Successor__c.value;
             this.contractStatus = this.record.fields.Service_End_Reason__c.value;
             this.contractId = this.record.fields.ContractId.value;
+            // this.contract = this.record.fields.Contract.value;
             this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
             this.disconnectDate = this.record.fields.Disconnect_Date__c.value;
             this.discoContact = this.record.fields.Disconnect_Contact__c.value;
@@ -88,16 +96,17 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.serviceEndReason = this.record.fields.Service_End_Reasons__c.value;
             this.status = this.record.fields.Status.value;
             this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
+            // this.terminationLiability = this.record.fields.Contract.Termination_Liability__c.value;
             this.contractLink = `/${ this.contractId }`;
             console.log( 'this.sofStatus', this.sofStatus );
             console.log( 'this.contractStatus', this.contractStatus );
             console.log( 'this.contractId', this.contractId );
             console.log( 'this.contractLink', this.contractLink );
-            console.log('this.contract', this.contract);
+            // console.log('this.contract', this.contract);
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
             console.log( 'this.disconnectDate', this.disconnectDate );
             console.log( 'this.discoContact', this.discoContact );
-                        
+            // console.log( 'this.termLiab', this.terminationLiability );
             
             // can add multiple if statements to check for different statuses
             if( this.sofStatus == 'Disconnect in Progress' ) {
