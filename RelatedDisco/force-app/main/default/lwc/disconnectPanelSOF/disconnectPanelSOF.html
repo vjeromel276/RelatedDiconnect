@@ -43,7 +43,7 @@
                                             class="slds-form-element__static is-read-only"
                                             field-name="Service_End_Reason__c"
                                         >
-                                            <a href={contractLink}>Contract Link</a>
+                                            <a href={contractLink}>{contract}</a>
                                         </lightning-output-field>
                                     </div>
                                 </div>
@@ -85,6 +85,34 @@
                                             onchange={handleFormChange}
                                             field-name="Customer_Requested_Disconnect_Date__c"
                                             value={selectedDate}
+                                        ></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked slds-is-editing">
+                                        <!-- <lightning-input-field
+                                            onchange={handleFormChange}
+                                            field-name="Equipment_Pickup_Needed__c"
+                                            value={equipmentPickupNeeded}
+                                        ></lightning-input-field> -->
+                                    </div>
+                                </div>
+                                <div
+                                    class="slds-form__item"
+                                    role="listitem"
+                                >
+                                    <div
+                                        class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_stacked">
+                                        <lightning-input-field
+                                            onchange={handleFormChange}
+                                            field-name="Disconnect_Date__c"
+                                            value={disconnectDate}
                                         ></lightning-input-field>
                                     </div>
                                 </div>

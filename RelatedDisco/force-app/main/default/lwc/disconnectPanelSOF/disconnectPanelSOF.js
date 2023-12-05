@@ -16,14 +16,16 @@ export default class SOFDisconnectPanel extends LightningElement {
     @track record = {};
     @track taskRecords = {};
     @track selectedDate;
+    @track disconnectDate='';
     @api hasTasks = false;
     @track isLoading = false;
     @track tasksFetchError = false;
     @track useNewTable = false;
     @track isCheckboxLoading = false;
     contractStatus = '';
-    contract = {};
-    contractLink=`https://everstream--uat.sandbox.lightning.force.com/lightning/r/Contract/${this.contract}/view`
+    @track contractId = '';
+    contract = '';
+    contractLink;
     custReqDiscoDate = '';
     @track discoContact = [];
     @track discoContactName = {};
@@ -38,18 +40,11 @@ export default class SOFDisconnectPanel extends LightningElement {
     hasFormChanged = false;
     formFieldChanges = {};
     
-    /**
-     * fields
-     * This is an array of fields to get from the record
-     * 
-     * @type        {array}
-     * 
-     * @see         https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.reference_wire_adapters_record
-     */
     fields = [
         'Order.Id',
         'Order.Status',
         'Order.ContractId',
+        'Order.Disconnect_Date__c',
         'Order.Service_End_Reason__c',
         'Order.Customer_Requested_Disconnect_Date__c',
         'Order.Disconnect_Contact__c',
@@ -63,15 +58,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.ServiceEndSub_Reasons__c',
     ];
 
-    /**
-     * get equipPickupForDiscoOptions()
-     * This function is used to get the equipment pickup for disconnect options
-     * 
-     * @return      {array}                             The equipment pickup for disconnect options
-     * 
-     * @uses        getRecord()                         To get the record
-     * 
-     */
     get equipPickupForDiscoOptions() {
         return [
             { label: 'Yes', value: 'Yes' },
@@ -90,8 +76,9 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.sofStatus = this.record.fields.Status.value;
             this.hasChildSOF = this.record.fields.Has_Successor__c.value;
             this.contractStatus = this.record.fields.Service_End_Reason__c.value;
-            this.contract = this.record.fields.ContractId.value;
+            this.contractId = this.record.fields.ContractId.value;
             this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
+            this.disconnectDate = this.record.fields.Disconnect_Date__c.value;
             this.discoContact = this.record.fields.Disconnect_Contact__c.value;
             this.discoContactName = this.record.fields.Disconnect_Contact__r.value;
             this.discoReqRecievedDate = this.record.fields.Disconnect_Request_Received_Date__c.value;
@@ -101,10 +88,14 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.serviceEndReason = this.record.fields.Service_End_Reasons__c.value;
             this.status = this.record.fields.Status.value;
             this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
+            this.contractLink = `/${ this.contractId }`;
             console.log( 'this.sofStatus', this.sofStatus );
             console.log( 'this.contractStatus', this.contractStatus );
-            console.log( 'this.contract', this.contract );
+            console.log( 'this.contractId', this.contractId );
+            console.log( 'this.contractLink', this.contractLink );
+            console.log('this.contract', this.contract);
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
+            console.log( 'this.disconnectDate', this.disconnectDate );
             console.log( 'this.discoContact', this.discoContact );
                         
             
@@ -188,7 +179,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         getTasks( { recordId: outputID } )
             .then( result => {
                 console.log( 'getTasks ' );
-                // console.log( { result } );
+                console.log( { result } );
                 // this.result = result;
                 if ( result != null ) {
                     //!LAST CHANGE
@@ -217,18 +208,6 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
             );
     }
-
-    /**
-     * handleCheckboxChange()
-     * This function is used to handle the checkbox change
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     * 
-     * @uses        updateRecord()                      To update the record
-     * @uses        showToast()                         To show a toast message
-     * @uses        getTasks()                          To get the tasks
-     */
     handleCheckboxChange( event ) {
         event.preventDefault();
         this.isLoading = true;
@@ -272,16 +251,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         // }
         
     }
-
-    /**
-     * retryUpdateRecord()
-     * This function is used to retry the updateRecord() function if it fails
-     * 
-     * @param       {object}            recordInput     The record input
-     * @param       {integer}           retries         The number of retries
-     * @param       {integer}           delay           The delay in seconds
-     * @return      {object}                            The result
-     */
     retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
         this.isCheckboxLoading = true;  // Start loading
         while ( retries > 0 ) {
@@ -307,26 +276,11 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
         this.isCheckboxLoading = false;  // End loading
     }
-
-    /**
-     * handleDateChange()
-     * This function is used to handle the date change
-     *  
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     */
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
     }
 
-    /**
-     * handleReasonChange()
-     * This function is used to handle the reason change
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     */
     handleFormChange( e ) {
         e.preventDefault();
         console.log('Field Name', e.target.fieldName);
@@ -354,6 +308,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
         const formFields = {};
         formFields.Id = this.recordId;
+        formFields.Disconnect_Date__c = this.disconnectDate;
         formFields.Equipment_Pickup_Needed__c = this.equipPickupForDisco;
         formFields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
         formFields.Service_End_Reasons__c = this.serviceEndReason;
@@ -365,25 +320,11 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.hasFormChanged = true;     
     }
 
-    /**
-     * handleUpdateButton()
-     * This function is used to handle the update button
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     */
     handleUpdateButton( e ) {
         e.preventDefault();
         this.hasFormChanged = false;
     }
 
-    /**
-     * handleCancelButton()
-     * This function is used to handle the cancel button
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     */
     handleCancelButton( e ) { 
         const inputFields = this.template.querySelectorAll(
             'lightning-input-field'
@@ -394,28 +335,10 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
-
-    /**
-     * handleSaveButton()
-     * This function is used to handle the save button
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     */
     hideButtons() {
         this.hasFormChanged = false;
     }
-    
-    /**
-     * showToast()
-     * This function is used to show a toast message
-     * 
-     * @param       {string}            title           The toast title
-     * @param       {string}            message         The toast message
-     * @param       {string}            variant         The toast variant
-     * 
-     * @return      {void}                              This function doesn't return anything
-     */
+    // toast message helper function
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
             title: title,
