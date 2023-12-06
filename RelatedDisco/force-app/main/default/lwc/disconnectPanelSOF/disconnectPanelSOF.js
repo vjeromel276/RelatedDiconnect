@@ -3,7 +3,8 @@ import { getRecord, reload, updateRecord } from 'lightning/uiRecordApi';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
-import initiateDisconnectApex from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
+
+// import initiateDisconnectApex from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
@@ -45,6 +46,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     qouteETF = '';
     mrcAmortized = '';
     contractEndDateEst = '';
+    billingStartDate = '';
     
     fields = [
         'Order.Id',
@@ -141,15 +143,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.terminationLiability = this.contractData.fields.Termination_Liability__c.value;
             this.contractNumber = this.contractData.fields.ContractNumber.value;
             console.log( 'this.termLiab', this.terminationLiability );
-            // if ( this.terminationLiability === 'Standard' && this.terminationLiability !== null
-            //     && this.contractId !== '' && this.mrcAmortized > 0) {
-            //     let monthsLeft = this.getMonthsDifference( this.contractEndDateEst );
-            //     console.log( 'monthsLeft', monthsLeft );
-            //     let etl = monthsLeft * this.mrcAmortized;
-            //     console.log( 'etl', etl );
-            //         this.qouteETF = etl;
-                
-            // }
+            console.log( 'this.contractNumber', this.contractNumber );
         } else if ( error ) {
             console.log( 'error', error );
         }
@@ -198,17 +192,6 @@ export default class SOFDisconnectPanel extends LightningElement {
      */
     initiateDisconnect() {
         console.log( 'initiateDisconnect' );
-        // initiateDisconnectApex( { recordId: this.recordId, customerRequestedDiscoDate: this.custReqDiscoDate } )
-        //     .then( result => {
-        //         console.log( 'initiateDisconnect result', result );
-        //         this.showToast( 'Disconnect Process Started', 'The disconnect process has been started.', 'success' );
-        //         this.getTasks();
-        //     } )
-        //     .catch( error => {
-        //         console.log( 'initiateDisconnect error', error );
-        //         this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
-        //     } );
-    
         this.isLoading = true;
         const fields = {};
         let formattedDate;
@@ -221,9 +204,11 @@ export default class SOFDisconnectPanel extends LightningElement {
             let date = new Date( this.selectedDate );
             formattedDate = date.toISOString().split( 'T' )[ 0 ];
             this.custReqDiscoDate = formattedDate;
+            console.log( 'formattedDate', formattedDate );
+            console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
             fields.Customer_Requested_Disconnect_Date__c = formattedDate;
         }
-        if ( this.terminationLiability === 'Standard' && this.terminationLiability !== null && this.contractId !== '' && this.mrcAmortized > 0) {
+        if (this.terminationLiability === 'Standard' && this.billingStartDate !== null && this.contractEndDateEst !== '' && this.mrcAmortized > 0 && this.custReqDiscoDate !== '') {
             let monthsLeft = this.getMonthsDifference( this.contractEndDateEst );
             console.log( 'monthsLeft', monthsLeft );
             let etl = monthsLeft * this.mrcAmortized;
@@ -240,6 +225,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                     this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
                     this.isLoading = false;
                 }, 100 );
+                //! Below can be used to call the apex method to start the disconnect process
                 // if ( formattedDate != null && formattedDate != '' ) {
                 //     console.log( 'formattedDate', formattedDate );
                 //     initiateDisconnectApex( { recordId: this.recordId, customerRequestedDiscoDate: formattedDate} )
@@ -310,6 +296,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
             );
     }
+    
     handleCheckboxChange( event ) {
         event.preventDefault();
         this.isLoading = true;
@@ -353,6 +340,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         // }
         
     }
+    
     retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
         this.isCheckboxLoading = true;  // Start loading
         while ( retries > 0 ) {
@@ -408,7 +396,23 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.discoContact = e.target.value;
             console.log(this.discoContact);
         }
+        
         const formFields = {};
+
+        if ( this.terminationLiability === 'Standard' && this.billingStartDate !== null && this.contractEndDateEst !== '' && this.mrcAmortized > 0 && this.custReqDiscoDate !== '' ) {
+            console.log( 'this.terminationLiability', this.terminationLiability );
+            console.log( 'this.billingStartDate', this.billingStartDate );
+            console.log( 'this.contractEndDateEst', this.contractEndDateEst );
+            console.log( 'this.mrcAmortized', this.mrcAmortized );
+            console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
+            
+            let monthsLeft = this.getMonthsDifference( this.contractEndDateEst );
+            console.log( 'monthsLeft', monthsLeft );
+            let etl = monthsLeft * this.mrcAmortized;
+            console.log( 'etl', etl );
+            formFields.Quoted_ETF__c = etl;
+        }
+        
         formFields.Id = this.recordId;
         formFields.Disconnect_Date__c = this.disconnectDate;
         formFields.Equipment_Pickup_Needed__c = this.equipPickupForDisco;
@@ -418,7 +422,9 @@ export default class SOFDisconnectPanel extends LightningElement {
         formFields.Proceed_with_Disconnect__c = this.proceedDisco;
         formFields.End_Reason_Notes__c = this.endReasonNotes;
         formFields.Disconnect_Contact__c = this.discoContact;
-        this.formFieldChanges = {formFields};
+        console.log('formFields', formFields);
+        this.formFieldChanges = { formFields };
+        console.log('formFieldChanges', this.formFieldChanges);
         this.hasFormChanged = true;     
     }
 

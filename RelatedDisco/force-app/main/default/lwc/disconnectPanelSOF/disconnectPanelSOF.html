@@ -222,8 +222,15 @@
                         <lightning-input
                             style="width: 300px;"
                             type="date"
-                            label="Customer Requested Disconnect Date If Known"
+                            label="Customer Requested Disconnect Date If Known"                            
                             value={selectedDate}
+                            onchange={handleDateChange}
+                        ></lightning-input>
+                        <lightning-input
+                            style="width: 300px;"
+                            type="date"
+                            label="Customer Requested Disconnect Date If Known"                            
+                            value={custReqDiscoDate}
                             onchange={handleDateChange}
                         ></lightning-input>
                     </lightning-card>

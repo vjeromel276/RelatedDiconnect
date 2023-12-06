@@ -54,24 +54,27 @@ public without sharing class SOFDisconnectPanelController{
     }
 
     @AuraEnabled
-    // public static Boolean initiateDisconnect(String recordId){//need to also pull in the requested disconnect date into this method and save it below
-    public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
+    public static Boolean initiateDisconnect(String recordId){//need to also pull in the requested disconnect date into this method and save it below
+    // public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
         System.debug('initiateDisconnect');
         System.debug(recordId);
+        Date customerRequestedDiscoDate = null;
+        // Datetime customerRequestedDiscoDate = System.today().addDays(45);
         System.debug(customerRequestedDiscoDate);
         Boolean isSuccess = false;
 
         //get the SOF details to calculate out the ETL if applicable
-        Order o = [SELECT ID, Contract.Termination_Liability__c, Service_Order_Agreement_MRC_Amortized__c, Contract_End_Date_Est__c, 
-                   Billing_Start_Date__c, PDF_Document_Comments__c
+        Order o = [SELECT ID, Contract.Termination_Liability__c, Service_Order_Agreement_MRC_Amortized__c, Contract_End_Date_Est__c, Customer_Requested_Disconnect_Date__c,
+                   Billing_Start_Date__c, PDF_Document_Comments__c,Disconnect_Date__c, Quoted_ETF__c, Status, Reported_Disconnect_Date__c
                    FROM Order WHERE ID = :recordId];
         
         if (o.Billing_Start_Date__c != NULL && o.Contract_End_Date_Est__c != NULL && o.Service_Order_Agreement_MRC_Amortized__c != NULL && o.Service_Order_Agreement_MRC_Amortized__c > 0) {
             if (o.PDF_Document_Comments__c == NULL && o.Contract != NULL && o.Contract.Termination_Liability__c != NULL && o.Contract.Termination_Liability__c.equals('Standard')) {
                 if (o.Contract_End_Date_Est__c < System.today()) {
                     Integer monthsLeft = System.today().monthsBetween(o.Contract_End_Date_Est__c);
+                    System.debug('monthsLeft: ' + monthsLeft);
                     Decimal etl = monthsLeft * o.Service_Order_Agreement_MRC_Amortized__c;
-
+                    System.debug('etl: ' + etl);
                     o.Quoted_ETF__c = etl;
                 }
             }
@@ -79,18 +82,28 @@ public without sharing class SOFDisconnectPanelController{
         
         o.Status = 'Disconnect in Progress';
         o.Reported_Disconnect_Date__c = System.today();
-        o.Disconnect_Date__c = System.today().addDays(30);
+        // o.Disconnect_Date__c = System.today().addDays(30);
 
         if (customerRequestedDiscoDate != NULL) {
-            o.Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate;
+            o.Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate;    
+            System.debug('o.Customer_Requested_Disconnect_Date__c: ' + o.Customer_Requested_Disconnect_Date__c);
+            if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
+                o.Disconnect_Date__c = System.today().addDays(30);
+                System.debug('o.Disconnect_Date__c: ' + o.Disconnect_Date__c);
+            } else {
+                o.Disconnect_Date__c = customerRequestedDiscoDate.addDays(30);
+                System.debug('o.Disconnect_Date__c: ' + o.Disconnect_Date__c);
+            }
         }
-
-        if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
-            o.Disconnect_Date__c = System.today().addDays(30);
-        } else {
-           o.Disconnect_Date__c = customerRequestedDiscoDate.addDays(30);
+        else if(o.Customer_Requested_Disconnect_Date__c != NULL){
+            if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
+                o.Disconnect_Date__c = System.today().addDays(30);
+                System.debug('o.Disconnect_Date__c: ' + o.Disconnect_Date__c);
+            } else {
+                o.Disconnect_Date__c = o.Customer_Requested_Disconnect_Date__c.addDays(30);
+                System.debug('o.Disconnect_Date__c: ' + o.Disconnect_Date__c);
+            }
         }
-
         update o;
 
         isSuccess = true;
