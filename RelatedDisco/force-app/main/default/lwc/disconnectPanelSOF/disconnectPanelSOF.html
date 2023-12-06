@@ -43,7 +43,6 @@
                                             class="slds-form-element__static is-read-only"
                                             field-name="Service_End_Reason__c"
                                         >
-                                            <a href={contractLink} ><p>{contract}</p></a>
                                         </lightning-output-field>
                                     </div>
                                 </div>
@@ -65,16 +64,13 @@
                                 <div
                                     class="slds-form__item"
                                     role="listitem"
-                                >
+                                ><h3>Contract Number</h3>
                                     <div class="slds-form-element slds-form-element_horizontal slds-form-element_stacked">
-                                    
-                                        <lightning-output-field
-                                            class="slds-form-element__static is-read-only"
+                                        <lightning-tile
+                                            
+                                            href={contractLink}
                                         >
-                                            <a href={contractLink}>
-                                                <p>{contract}</p>
-                                            </a>
-                                        </lightning-output-field>
+                                        </lightning-tile><a>{contractNumber}</a>
                                     </div>
                                 </div>
                                 <div

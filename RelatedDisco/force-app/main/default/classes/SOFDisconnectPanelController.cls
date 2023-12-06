@@ -54,9 +54,11 @@ public without sharing class SOFDisconnectPanelController{
     }
 
     @AuraEnabled
-    public static Boolean initiateDisconnect(String recordId){//need to also pull in the requested disconnect date into this method and save it below
-        //public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
+    // public static Boolean initiateDisconnect(String recordId){//need to also pull in the requested disconnect date into this method and save it below
+    public static Boolean initiateDisconnect(String recordId, Date customerRequestedDiscoDate) {
         System.debug('initiateDisconnect');
+        System.debug(recordId);
+        System.debug(customerRequestedDiscoDate);
         Boolean isSuccess = false;
 
         //get the SOF details to calculate out the ETL if applicable
@@ -79,15 +81,15 @@ public without sharing class SOFDisconnectPanelController{
         o.Reported_Disconnect_Date__c = System.today();
         o.Disconnect_Date__c = System.today().addDays(30);
 
-        /*if (customerRequestedDiscoDate != NULL) {
+        if (customerRequestedDiscoDate != NULL) {
             o.Customer_Requested_Disconnect_Date__c = customerRequestedDiscoDate;
-        }*/
+        }
 
-        //if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
+        if (System.today().addDays(30) > o.Customer_Requested_Disconnect_Date__c) {
             o.Disconnect_Date__c = System.today().addDays(30);
-        //} else {
-        //    o.Disconnect_Date__c = customerRequestedDiscoDate.addDays(30);
-        //}
+        } else {
+           o.Disconnect_Date__c = customerRequestedDiscoDate.addDays(30);
+        }
 
         update o;
 
