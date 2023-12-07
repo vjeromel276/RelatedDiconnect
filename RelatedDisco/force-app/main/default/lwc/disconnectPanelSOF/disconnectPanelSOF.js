@@ -53,12 +53,11 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.Status',
         'Order.ContractId',
         'Order.Disconnect_Date__c',
-        // 'Order.Contract',
+        // 'Order.ContractName',
         'Order.Billing_Start_Date__c',
         'Order.Contract_End_Date_Est__c',
         'Order.Service_Order_Agreement_MRC_Amortized__c',
         'Order.PDF_Document_Comments__c',
-        // 'Order.Contract.Termination_Liability__c',
         'Order.Service_End_Reason__c',
         'Order.Customer_Requested_Disconnect_Date__c',
         'Order.Disconnect_Contact__c',
@@ -195,19 +194,48 @@ export default class SOFDisconnectPanel extends LightningElement {
         this.isLoading = true;
         const fields = {};
         let formattedDate;
+        let date;
         fields.Id = this.recordId;
+        fields.ContractName = this.contractNumber;
         fields.Status = 'Disconnect in Progress';
         fields.Service_End_Reason__c = 'Draft';
         // fields.Quoted_ETF__c = this.qouteETF;
         // Format the selected date to 'YYYY-MM-DD'
-        if ( this.selectedDate != null ) {
-            let date = new Date( this.selectedDate );
+        console.log( 'this.selectedDate', this.selectedDate );
+        
+        if ( this.selectedDate !== null && this.selectedDate !== '' && this.selectedDate !== undefined ) {
+            date = new Date( this.selectedDate );
             formattedDate = date.toISOString().split( 'T' )[ 0 ];
+            let todaysDate = new Date();
+            let inputDate = new Date( this.selectedDate );
+            // Calculate the difference in days
+            const timeDiff = Math.abs(inputDate.getTime() - todaysDate.getTime());
+            const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
             this.custReqDiscoDate = formattedDate;
-            console.log( 'formattedDate', formattedDate );
+            
+            // Check if the difference in custReqDiscoDate and todaysDate is greater than 30 days
+            if ( diffDays > 30 && this.custReqDiscoDate !== null && this.custReqDiscoDate !== '' ) {
+                // If it is greater than 30 days, set the disconnectDate to custReqDiscoDate
+                console.log('this.custReqDiscoDatec>30 from today' + this.custReqDiscoDate);
+                this.disconnectDate = this.custReqDiscoDate;
+                fields.Disconnect_Date__c = this.disconnectDate;
+                console.log('this.disconnectDate: ' + this.disconnectDate);
+            }
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
-            fields.Customer_Requested_Disconnect_Date__c = formattedDate;
+            fields.Customer_Requested_Disconnect_Date__c = this.custReqDiscoDate;
+        } else { 
+            // If it is less than 30 days, set the disconnectDate to 30 days from today
+            console.log('this.custReqDiscoDatec < 30 from today' + this.custReqDiscoDate);
+            let unformattedDisconnectDate = new Date();
+            unformattedDisconnectDate.setDate( unformattedDisconnectDate.getDate() + 30 );
+            const dd = String(unformattedDisconnectDate.getDate()).padStart(2, "0");
+            const mm = String(unformattedDisconnectDate.getMonth() + 1).padStart(2, "0");
+            const yyyy = unformattedDisconnectDate.getFullYear();
+            this.disconnectDate = yyyy + '-' + mm + '-' + dd;
+            fields.Disconnect_Date__c = this.disconnectDate;
+            console.log('this.disconnectDate: ' + this.disconnectDate);
         }
+        
         if (this.terminationLiability === 'Standard' && this.billingStartDate !== null && this.contractEndDateEst !== '' && this.mrcAmortized > 0 && this.custReqDiscoDate !== '') {
             let monthsLeft = this.getMonthsDifference( this.contractEndDateEst );
             console.log( 'monthsLeft', monthsLeft );
@@ -215,6 +243,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             console.log( 'etl', etl );
             fields.Quoted_ETF__c = etl;
         }
+        
         const recordInput = { fields };
         
         updateRecord( recordInput )
@@ -238,7 +267,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                 //             console.log( 'initiateDisconnect error', error );
                 //             this.showToast( 'Unable To Start Disconnect Process', 'The disconnect process has not been started.', 'error' );
                 //         } );
-                // }
+                //! }
             } )
             .catch( error => {
                 console.log( 'updateRecord error', error );

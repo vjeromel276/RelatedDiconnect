@@ -37,7 +37,7 @@
                                     role="listitem"
                                 >
                                     <div
-                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked">
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked noLeftPad">
 
                                         <lightning-output-field
                                             class="slds-form-element__static is-read-only"
@@ -51,7 +51,7 @@
                                     role="listitem"
                                 >
                                     <div
-                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked ">
+                                        class="slds-form-element slds-form-element_horizontal slds-form-element_stacked noLeftPad">
                                         <lightning-output-field
                                             class="slds-form-element__static is-read-only"
                                             field-name="Disconnect_Request_Received_Date__c"
@@ -61,16 +61,15 @@
                             </div>
 
                             <div class="slds-form__row">
-                                <div
-                                    class="slds-form__item"
-                                    role="listitem"
-                                ><h3>Contract Number</h3>
-                                    <div class="slds-form-element slds-form-element_horizontal slds-form-element_stacked">
-                                        <lightning-tile
-                                            
-                                            href={contractLink}
-                                        >
-                                        </lightning-tile><a>{contractNumber}</a>
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_horizontal slds-form-element_stacked noLeftPad">
+                                        <div class="slds-form-element__static is-read-only slds-form-element slds-form-element_horizontal">
+                                        <span class="slds-form-element__label">Contract Number</span>
+                                        <div class="slds-form-element__control">
+                                            <lightning-tile href={contractLink} ></lightning-tile>
+                                            <a>{contractNumber}</a>
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div
@@ -222,15 +221,8 @@
                         <lightning-input
                             style="width: 300px;"
                             type="date"
-                            label="Customer Requested Disconnect Date If Known"                            
+                            label="Customer Requested Disconnect Date If Known"
                             value={selectedDate}
-                            onchange={handleDateChange}
-                        ></lightning-input>
-                        <lightning-input
-                            style="width: 300px;"
-                            type="date"
-                            label="Customer Requested Disconnect Date If Known"                            
-                            value={custReqDiscoDate}
                             onchange={handleDateChange}
                         ></lightning-input>
                     </lightning-card>
