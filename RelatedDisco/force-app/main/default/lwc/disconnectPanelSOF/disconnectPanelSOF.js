@@ -1,10 +1,11 @@
+/* eslint-disable no-new */
+/* eslint-disable @lwc/lwc/no-async-operation */
+
 import { LightningElement, api, track, wire } from 'lwc';
-import { getRecord, reload, updateRecord } from 'lightning/uiRecordApi';
+import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getTasks from '@salesforce/apex/SOFDisconnectPanelController.getTasks';
-
-// import initiateDisconnectApex from '@salesforce/apex/SOFDisconnectPanelController.initiateDisconnect';
 
 export default class SOFDisconnectPanel extends LightningElement {
     @api recordId;
@@ -53,7 +54,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.Status',
         'Order.ContractId',
         'Order.Disconnect_Date__c',
-        // 'Order.ContractName',
         'Order.Billing_Start_Date__c',
         'Order.Contract_End_Date_Est__c',
         'Order.Service_Order_Agreement_MRC_Amortized__c',
@@ -394,8 +394,8 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
         }
         this.isCheckboxLoading = false;  // End loading
+        return;
     }
-    
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
@@ -473,11 +473,9 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
-    
     hideButtons() {
         this.hasFormChanged = false;
     }
-
     // toast message helper function
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
