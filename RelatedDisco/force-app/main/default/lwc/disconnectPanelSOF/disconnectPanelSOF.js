@@ -395,6 +395,7 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
         this.isCheckboxLoading = false;  // End loading
     }
+    
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
@@ -472,9 +473,11 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
+    
     hideButtons() {
         this.hasFormChanged = false;
     }
+
     // toast message helper function
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
