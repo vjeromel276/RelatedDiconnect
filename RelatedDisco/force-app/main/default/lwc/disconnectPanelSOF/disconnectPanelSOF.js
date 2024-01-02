@@ -1,3 +1,4 @@
+/* eslint-disable @lwc/lwc/no-api-reassignments */
 /* eslint-disable no-new */
 /* eslint-disable @lwc/lwc/no-async-operation */
 
@@ -177,18 +178,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         { label: 'Not Needed', fieldName: 'Not_Applicable__c', type: 'boolean', editable: true },
     ];
 
-    /**
-     * initiateDisconnect()
-     * This function is used to initiate the disconnect process
-     * 
-     * @param       {object}            event           The event object
-     * @return      {void}                              This function doesn't return anything
-     * 
-     * @uses        updateRecord()                      To update the record
-     * @uses        showToast()                         To show a toast message
-     * @uses        getTasks()                          To get the tasks
-     * 
-     */
     initiateDisconnect() {
         console.log( 'initiateDisconnect' );
         this.isLoading = true;
