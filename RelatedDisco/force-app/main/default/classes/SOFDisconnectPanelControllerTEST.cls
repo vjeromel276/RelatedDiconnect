@@ -6,7 +6,7 @@ public with sharing class SOFDisconnectPanelControllerTEST {
     @isTest
     static void testGetTasks() {
 
-        Order soa = [SELECT Id, Contract.Termination_Liability__c, Service_Order_Agreement_MRC_Amortized__c, Contract_End_Date_Est__c, Customer_Requested_Disconnect_Date__c,
+        Order soa = [SELECT Id, Service_Order_Agreement_MRC_Amortized__c, Contract_End_Date_Est__c, Customer_Requested_Disconnect_Date__c,
                    Billing_Start_Date__c, PDF_Document_Comments__c,Disconnect_Date__c, Quoted_ETF__c, Status, Reported_Disconnect_Date__c
                    FROM Order WHERE Id ='8010B0000005yJgQAI' LIMIT 1];
 
