@@ -124,7 +124,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             
             
             // can add multiple if statements to check for different statuses
-            if( this.sofStatus == 'Disconnect in Progress' ) {
+            if( this.sofStatus === 'Disconnect in Progress' ) {
                 this.getTasks();
             }
             
@@ -281,7 +281,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     getTasks() {
         this.isLoading = true;
         const outputID = this.recordId
-        const updateTrys = 5;
+        // const updateTrys = 5;
         getTasks( { recordId: outputID } )
             .then( result => {
                 console.log( 'getTasks ' );
@@ -359,32 +359,32 @@ export default class SOFDisconnectPanel extends LightningElement {
         
     }
     
-    retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
-        this.isCheckboxLoading = true;  // Start loading
-        while ( retries > 0 ) {
+    // retryUpdateRecord( recordInput, retries = 5, delay = 20 ) {
+    //     this.isCheckboxLoading = true;  // Start loading
+    //     while ( retries > 0 ) {
             
-            console.log('retries', retries);
-            try {
-                const result = updateRecord( recordInput );
-                this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
-                this.getTasks();
-                this.isLoading = false;
-                return result;
-            } catch ( error ) {
-                retries -= 1;
-                if ( retries === 0 ) {
-                    this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
-                    this.getTasks();
-                    this.isLoading = false;
-                    throw error;
-                }
-                // waits 1 second
-                new Promise( resolve => setTimeout( resolve, delay ) );
-            }
-        }
-        this.isCheckboxLoading = false;  // End loading
-        return;
-    }
+    //         console.log('retries', retries);
+    //         try {
+    //             const result = updateRecord( recordInput );
+    //             this.showToast( 'Record Updated', 'The record has been updated.', 'success' );
+    //             this.getTasks();
+    //             this.isLoading = false;
+    //             return result;
+    //         } catch ( error ) {
+    //             retries -= 1;
+    //             if ( retries === 0 ) {
+    //                 this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
+    //                 this.getTasks();
+    //                 this.isLoading = false;
+    //                 throw error;
+    //             }
+    //             // waits 1 second
+    //             new Promise( resolve => setTimeout( resolve, delay ) );
+    //         }
+    //     }
+    //     this.isCheckboxLoading = false;  // End loading
+    //     return;
+    // }
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
@@ -453,6 +453,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     }
 
     handleCancelButton( e ) { 
+        e.preventDefault();
         const inputFields = this.template.querySelectorAll(
             'lightning-input-field'
         );
