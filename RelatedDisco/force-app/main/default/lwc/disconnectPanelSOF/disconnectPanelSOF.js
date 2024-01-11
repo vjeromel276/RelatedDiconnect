@@ -185,7 +185,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         let formattedDate;
         let date;
         fields.Id = this.recordId;
-        fields.ContractName = this.contractNumber;
         fields.Status = 'Disconnect in Progress';
         fields.Service_End_Reason__c = 'Draft';
         // fields.Quoted_ETF__c = this.qouteETF;
@@ -259,7 +258,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                 //! }
             } )
             .catch( error => {
-                console.log( 'updateRecord error', error );
+                console.log( 'updateRecord(init) error', error );
                 this.showToast( 'Record Update Failed', 'The record has not been updated.', 'error' );
                 this.isLoading = false;
             } );

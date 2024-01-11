@@ -1,0 +1,143 @@
+<template>
+    <lightning-card title="Create Tags" icon-name="custom:custom63" >
+            <!-- loader-->
+    <template if:true={generalModalLoader}>
+        <div class="modalSpinner">
+            <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+        </div>
+    </template> 
+
+        <div  class="slds-p-around_large slds-var-p-around_large">
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col">
+                <h5 class="slds-text-heading_small">Tag Details/Options: {bayVal}</h5>
+                <small><em>Choose the Dymo printer, tag type you would like to print I.E asset tag or shelf tag. Finally choose the quantity</em></small>
+<br>
+<br>
+                <lightning-combobox name="printer" label="Select A Printer" value={printerVal} placeholder="Select Printer" options={printerOptions} class="inputCmp slds-m-bottom_medium" onchange={handlePrinterChange} required ></lightning-combobox>
+                
+                <lightning-combobox name="type" label="Select Tag Type" value={TagTypeVal} placeholder="Select Tag Type" options={getTagTypeOptions} class="inputCmpWarehouse slds-m-bottom_medium" onchange={handleTagTypeChange} required ></lightning-combobox>
+    
+    
+                <template if:true={showWarehouse}>
+                    <template if:true={warehouses}>
+                        <lightning-combobox name="Warehouse" label="Warehouse (Shelf Tags Only)" value={WarehouseVal} placeholder="Select Warehouse" options={warehouseOptions} class="slds-m-bottom_medium" onchange={handleWarehouseChange} required ></lightning-combobox>
+                    </template>
+                </template>
+
+                <template if:true={showRacks}>
+                    <lightning-combobox name="Rack" label="Racks (Shelf Tags Only)" value={rackVal} placeholder="Select Rack" options={rackOptions} class="inputCmpRack slds-m-bottom_medium" onchange={handleRackChange}  ></lightning-combobox>
+                
+                
+
+                    <template if:true={rackVal}>
+                        <lightning-accordion allow-multiple-sections-open>
+                            <lightning-accordion-section name="A" label="Print Shelf Tags">
+                                <p> <span><lightning-icon class="my-icon" icon-name="utility:info" size="xx-small"></lightning-icon></span><em>Print All tags for this rack.</em></p>
+        
+                                    
+                                       <br>
+                                        <lightning-button label="Print Tags " variant="brand" title="Non-primary action" icon-name="utility:print" onclick={hanlePrintTagsForRack} class="slds-m-top_large" disabled={allowPrint}></lightning-button>
+
+                                        <br><br><br>
+                                        <p> <span><lightning-icon class="my-icon" icon-name="utility:info" size="xx-small"></lightning-icon></span><em>Print single Tag.</em></p>
+                                        
+                                        <template if:true={showBays}>
+                                            <lightning-combobox name="Bay" label="Bay (Shelf Tags Only)" value={bayVal} placeholder="Select Bay" options={bayOptions} class="inputCmpBays slds-m-bottom_medium" onchange={handleBayChange}  ></lightning-combobox>
+                                        </template>
+                        
+                                        <template if:true={showShelfNameSelect}>
+                                                 
+                                            <lightning-record-edit-form object-api-name="Warehouse_Shelf__c" id="fdefedsss" >
+                                                <lightning-input-field field-name="Name__c"   onchange={shelfNameChange}> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </template>
+
+                            </lightning-accordion-section>
+        
+                            <lightning-accordion-section name="B" label="Create / Print Individual Shelf Tags">
+                                <p><span><lightning-icon class="my-icon" icon-name="utility:info" size="xx-small"></lightning-icon></span><em>Create Shelves invidual Shelves Below. (if the shelf already exits a label will be printed out for the existing shelf).</em>   </p>
+                                <template if:true={showBays}>
+                                    <lightning-combobox name="Bay" label="Bay (Shelf Tags Only)" value={bayVal} placeholder="Select Bay" options={bayOptions} class="inputCmpBays slds-m-bottom_medium" onchange={handleBayChange}  ></lightning-combobox>
+                                </template>
+                
+                                <template if:true={showShelfNameSelect}>
+                                         
+                                    <lightning-record-edit-form object-api-name="Warehouse_Shelf__c" id="fdefeds" >
+                                        <lightning-input-field field-name="Name__c"   onchange={shelfNameChange}> </lightning-input-field>
+                                    </lightning-record-edit-form>
+                                </template>
+                            </lightning-accordion-section>
+                        </lightning-accordion>
+                    </template>
+
+                    </template>    
+
+    
+                <template if:true={shoechangingLoader}>
+                    <div class="changingLoader">
+                        <lightning-spinner  variant="brand" alternative-text="Loading" size="x-small"></lightning-spinner>
+                    </div>
+                </template>
+                <lightning-input type="number" name="Quantity"  value={quantityVal} label="Select a quantity of Asset Tag Labels to print out. (Dymo printer and installed Dymo Printer software is required)" max="99" class="slds-m-bottom_medium"  onchange={quantityChange} ></lightning-input>
+
+
+               
+
+                <lightning-input type="number" name="numLabelsPerTag"  value={numLabelsPerTagVal} label="Select Number of Copies of Each Label (max 2)" max="2" class="slds-m-bottom_medium"  onchange={numLabelsPerTagChange} ></lightning-input>
+
+
+<br><br>
+                <lightning-button label="Print Tags" variant="brand" title="Non-primary action" icon-name="utility:print" onclick={handleClick} class="slds-m-top_large" disabled={allowPrint}></lightning-button>
+                <lightning-button label="Check Dymo Setup"  title="Check if dymo is set up correctly and supported" icon-name="utility:check" onclick={checkSupport} class="slds-m-top_large slds-m-left_large" ></lightning-button>
+
+
+      
+    
+            </div>
+            <div class="slds-col">
+                <template if:true={PreviewImageSrc}>
+                    <h5 class="slds-text-heading_small">Preview Example Label:</h5>
+                    <img src={PreviewImageSrc} alt="example">
+                    <br><br>
+                </template>
+                <template if:true={showDymoChecks}>
+                    <h5 class="slds-text-heading_small">Dymo Printer Setup Status:</h5>
+                    <br>
+                    <p><b>Browser Supported: </b>{isBrowserSupported}</p>
+                    <p><b>Framework Installed: </b>{isFrameworkInstalled}</p>
+                    <p><b>Dymo Web Service Present: </b>{isWebServicePresent}</p>
+                    <p><b>Printers: </b></p>
+
+                    <template if:true={printers}>
+                        <ul>
+                        <template for:each={printers} for:item="p">
+                            <li key={p.label}>{p.label} </li>
+                        </template>
+                        </ul>
+                        <br>
+                        <br>
+                        <br>
+                    </template>
+
+                    
+                </template>
+                <span><lightning-icon class="my-icon" icon-name="utility:info" size="xx-small"></lightning-icon></span><em> Dymo Printer not showing?</em><br>
+                Click <a href="https://www.dymo.com/support?cfid=user-guide" target="_blank"> HERE</a> to download the correct Dymo Printers and Drivers
+            </div>
+          </div>
+
+
+
+        
+
+ 
+
+
+        
+      
+</div>
+    </lightning-card>
+
+
+</template>

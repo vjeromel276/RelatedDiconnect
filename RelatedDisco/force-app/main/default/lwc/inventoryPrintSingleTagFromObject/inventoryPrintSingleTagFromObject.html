@@ -1,0 +1,16 @@
+<template >
+        <!-- loader-->
+        <template if:true={showLoader}>
+            <div class="modalSpinner">
+                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template> 
+    
+    <div class="slds-p-around_x-large">
+        <lightning-card  title="Print Label" class="slds-m-around_large">
+            <lightning-combobox name="printer" label="Select A Printer" value={printerVal} placeholder="Select Printer" options={printerOptions} class="inputCmp slds-m-bottom_medium" onchange={handlePrinterChange} required ></lightning-combobox>
+            <lightning-input type="number" name="numLabelsPerTag"  value={numLabelsPerTagVal} label="Select Number of Copies of Each Label (max 2)" max="2" class="slds-m-bottom_medium"  onchange={numLabelsPerTagChange} ></lightning-input>
+            <lightning-button label="Print Tag" variant="brand" title="Non-primary action" icon-name="utility:print" onclick={handleClick} class="slds-m-top_large" disabled={allowPrint}></lightning-button>
+        </lightning-card>
+    </div>
+</template>

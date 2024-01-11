@@ -1,0 +1,64 @@
+<template>
+    <lightning-card title="Scan Asset Tag" icon-name="custom:custom63" >
+        <div class="slds-align_absolute-center slds-m-vertical_large" style="flex-direction: column; text-align: center;">
+            <div class="slds-text-heading_medium">Move Asset to SOF</div>
+            <lightning-input type="number" name="qty" label="Quantity" onchange={inputValChangeQuanity} value={QuanityVal} ></lightning-input>
+
+            <lightning-record-edit-form object-api-name="Asset" id="fdefeds"  onload={hideModalLoader}>
+                <lightning-input-field field-name="Service_Order_Agreement__c"  onchange={inputValChangeSOF} label="SOF Number" value={inputValSOF} required="required"> </lightning-input-field>
+            </lightning-record-edit-form>
+            <!--desktop-->
+            <template if:false={isMobile}>
+                <div class="slds-p-around_medium">
+                    <lightning-input class="scanTagInput" type="text" onchange={inputValChange} label="Scan Tag/Serial" value={inputVal} onkeypress={handleEnter} data-fieldname="scanTagInput" > </lightning-input>
+                </div>
+            </template>
+            <!--mobile-->
+            <template if:true={isMobile}> 
+                <lightning-button variant="brand" class="slds-var-m-left_x-small"  icon-name="utility:scan" label="Scan Tag/Serial" title="Open a camera view and look for a barcode to scan" onclick={handleBeginScanClick}></lightning-button>
+            </template>
+            <br>
+        </div>
+        <!-- loader-->
+        <template if:true={generalModalLoader}>
+            <div class="modalSpinner">
+                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template> 
+    </lightning-card>
+
+
+    <template if:true={ScannedAssestsList}>
+        <div class="slds-text-heading_small slds-m-left_medium">Processed Assets:</div>
+
+        <ul class="slds-m-around_large">
+            <template for:each={ScannedAssestsList} for:item="item">
+                <li key={item}   class="slds-box" >
+                    <div class="slds-grid slds-gutters slds-p-around_small slds-wrap">
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2  ">
+                            <div><b>Name: </b> <span> <a href="#" target="_blank">{item.name}</a></span></div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2  ">
+                                <template if:true={item.isMoveQuantity}><template if:true={item.quantity}>Qty: &nbsp;<b>{item.quantity}</b>&nbsp; </template> Asset &nbsp;<b>{item.name}</b> &nbsp;  moved to &nbsp; <b>{item.to}</b>&nbsp;</template>
+                                <template if:false={item.isMoveQuantity}> Asset &nbsp;<b>{item.name}</b> &nbsp;  assigned to  &nbsp;<b>{item.to}&nbsp;</b></template>
+                        </div>
+
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </template> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+</template>

@@ -1,0 +1,339 @@
+<!-- barcodeScannerExample.html -->
+<template>
+    <lightning-card title="Inventory stuff..." icon-name="custom:custom63" >
+
+        <div class="slds-text-align_center">
+            <span class="slds-text-heading_large">Scan Asset To Location</span>
+        </div>
+        <div class="slds-grid slds-gutters slds-p-around_small slds-wrap">
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3 slds-order_3 slds-large-order_1  ">
+                <template if:true={warehouses}>
+                    <lightning-combobox name="Warehouse" label="Warehouse" value={WarehouseVal} placeholder="Select Warehouse" options={warehouseOptions} class="inputCmp" onchange={handleWarehouseChange} required ></lightning-combobox>
+                </template>
+
+
+
+                <template if:true={showRacks}>
+                    <lightning-combobox name="Rack" label="Rack" value={rackVal} placeholder="Select Rack" options={rackOptions} class="inputCmpRack" onchange={handleRackChange} required ></lightning-combobox>
+                </template>                
+
+              
+                <template if:true={showBays}>
+                    <lightning-combobox name="Bay" label="Bay" value={bayVal} placeholder="Select Bay" options={bayOptions} class="inputCmpBays" onchange={handleBayChange} required ></lightning-combobox>
+                </template>
+
+                <template if:true={showShelves}>
+                    <lightning-combobox name="shelf" label="Shelf/Location" value={shelfVal} placeholder="Select Shelf" options={shelfOptions} class="inputCmpShelves" onchange={handleShelfChange} required ></lightning-combobox>
+                </template>
+            
+                <template if:true={shoechangingLoader}>
+                    <div class="changingLoader">
+                        <lightning-spinner  variant="brand" alternative-text="Loading" size="x-small"></lightning-spinner>
+                    </div>
+                </template>
+
+
+                <template if:false={isMobile}>
+                    <lightning-input  type="scanShelfTag" onchange={handlescannedShelfTagChange} label="Scan Shelf/Location Tag" value={scannedShelfTag} onkeypress={handlescannedShelfTagEnter} data-fieldname="scanShelfTag" class="scanShelfTagInput"> </lightning-input>
+                </template>
+
+                <lightning-input  type="number"  onchange={handleQuantityChange} label="Quantity"  value={quantityToMoveVal}  data-fieldname="quantity" class="scanShelfTagInput"></lightning-input>
+
+                <template if:true={isMobile}>
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small slds-align_absolute-center slds-m-top_large "
+                        disabled={scanButtonDisabled}
+                        icon-name="utility:scan"
+                        label="Scan Shelf Tag"
+                        title="Open a camera view and look for a barcode to scan"
+                        onclick={handleBeginScanClick}>
+                    </lightning-button>
+
+                    <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small slds-align_absolute-center slds-m-top_large "
+                    disabled={scanButtonDisabled}
+                    icon-name="utility:scan"
+                    label="Scan Asset Tag"
+                    title="Open a camera view and look for a barcode to scan"
+                    onclick={handleBeginScanClick}>
+                </lightning-button>
+                </template>
+
+
+
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3 slds-order_2 slds-large-order_2 ">
+
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3   slds-order_1 slds-large-order_3">
+                <div class="align-right">
+                      <!-- Neutral variant (default) -->
+                      <lightning-button label="Create Asset" title="Create Asset"  onclick={opencreateAssetModal} class="slds-m-left_medium assetListButton" ></lightning-button>
+                      <lightning-button variant="brand" class="slds-var-m-left_x-small" disabled={isMobile} icon-name="utility:scan" label="Clear List" title="Clear List" onclick={ClearScannedItems}></lightning-button>
+                </div>
+            </div>
+          </div>
+
+
+               
+
+
+
+    
+
+        <!--=======================================================================================
+        ________________________________________| Desktop |________________________________________
+        =========================================================================================-->
+        <template if:false={isMobile}>
+
+            <div class="slds-p-around_medium">
+                <lightning-input
+                type="text"
+                onchange={inputValChange}
+                label="Scan Asset Tag"
+                value={inputVal}
+                onkeypress={handleEnter}
+                data-fieldname="Amount"
+                class="tagInputcmp"
+    > 
+            </lightning-input>
+            </div>
+        </template>
+        <!--************************************************************************************-->
+
+
+
+
+
+
+
+
+        <template if:true={ScannedAssestsList}>
+            <div class="slds-text-heading_small slds-m-left_medium">Processed Assets:</div>
+
+
+            <ul class="slds-m-around_large">
+                <template for:each={ScannedAssestsList} for:item="item">
+                    <li key={item}   class="slds-box" >
+                        <div class="slds-grid slds-gutters slds-p-around_small slds-wrap">
+                            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2  ">
+                                <div><b>Name: </b> <span> <a href="#" target="_blank">{item.name}</a></span></div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2  ">
+                                <template if:false={item.notcreated}>
+                                    <template if:true={item.isMove}><template if:true={item.quantity}>Qty: &nbsp;<b>{item.quantity}</b>&nbsp; </template> Asset &nbsp;<b>{item.name}</b> &nbsp; <template if:true={item.serial}> serial #: {item.serial}&nbsp; </template>  moved from &nbsp;<b> {item.from}</b>&nbsp; to &nbsp;<b>{item.to}</b>&nbsp;</template>
+                                    <template if:false={item.isMove}><template if:true={item.quantity}>Qty: &nbsp;<b>{item.quantity}</b>&nbsp; </template> Asset &nbsp;<b>{item.name}</b> &nbsp; <template if:true={item.serial}> serial #: ({item.serial})&nbsp; </template> assigned to  &nbsp;<b>{item.to}&nbsp;</b></template>
+
+                                </template>
+                                <template if:true={item.notcreated}>
+                                    <div class="d-flex">
+                                        <em>This asset currently doesnt exit, do you want to creat an asset with this asset tag?</em>
+                                        <lightning-button variant="brand" class="slds-var-m-left_x-small" icon-name="utility:scan" label="create asset" title="create asset" data-recordid={item.Name} onclick={opencreateAssetModal}></lightning-button>
+                                        <template if:true={createAssetLoader}>
+                                            <div class="InventoryLolder">
+                                                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+                                            </div>     
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                        </div>
+                    </li>
+                </template>
+            </ul>
+
+
+
+            
+                <!--<ul class="poLineGrid">
+                    <template for:each={ScannedAssestsList} for:item="item">
+                        <li key={item}  class="poLineGridItem" >
+                            <div class="poGrid ">
+                                <div><b>Name: </b> <span> <a href="#" target="_blank">{item.name}</a></span></div>
+                                <template if:false={item.notcreated}>
+                                    <template if:true={item.isMove}>Asset &nbsp;<b>{item.name}</b> &nbsp; <template if:true={item.serial}> serial #: {item.serial}&nbsp; </template>  moved from &nbsp;<b> {item.from}</b>&nbsp; to &nbsp;<b>{item.to}</b>&nbsp;</template>
+                                    <template if:false={item.isMove}>Asset &nbsp;<b>{item.name}</b> &nbsp; <template if:true={item.serial}> serial #: ({item.serial})&nbsp; </template> assigned to  &nbsp;<b>{item.to}&nbsp;</b></template>
+
+                                </template>
+                                <template if:true={item.notcreated}>
+                                    <div class="d-flex">
+                                        <em>This asset currently doesnt exit, do you want to creat an asset with this asset tag?</em>
+                                        <lightning-button variant="brand" class="slds-var-m-left_x-small" icon-name="utility:scan" label="create asset" title="create asset" data-recordid={item.Name} onclick={opencreateAssetModal}></lightning-button>
+                                        <template if:true={createAssetLoader}>
+                                            <div class="InventoryLolder">
+                                                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+                                            </div>     
+                                        </template>
+                                    </div>
+                                </template>
+                                
+                            </div>
+                            
+                        </li>
+                    </template>
+                    </ul>-->
+        </template>
+
+
+
+
+
+
+
+        <template if:true={generalLoader}>
+            <div class="modalSpinner">
+                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template>
+
+
+
+
+        <!-- link to ticket modal start -->      
+        <template if:true={isShowcreateAssetModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- modal header start -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={hidecreateAssetModal}>
+                            <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                            
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create Asset</h2>
+                    </header>
+
+                    <!-- modal body start -->
+                    <div class="slds-modal__content slds-p-around_medium noc_modal" id="modal-content-id-1">
+        
+                        <template if:true={generalModalLoader}>
+                            <div class="modalSpinner">
+                                <lightning-spinner variant="brand" alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+                        </template>
+
+                        <div class="slds-p-around_medium lgc-bg">
+
+          
+                
+                            <template if:true={warehouses}>
+                                    <lightning-combobox
+                                    name="Warehouse"
+                                    label="Warehouse"
+                                    value={WarehouseVal}
+                                    placeholder="Select Warehouse"
+                                    options={warehouseOptions}
+                                    class="inputCmp"
+                                    onchange={handleWarehouseChange} required ></lightning-combobox>
+                                </template>
+                                 <lightning-record-edit-form object-api-name="Receiving__c" id="s"  onload={hideModalLoader}  >
+                                    <lightning-input-field field-name="Purchase_Order__c"  onchange={selectedPOChange} > </lightning-input-field>
+                                </lightning-record-edit-form>
+                                <lightning-record-edit-form object-api-name="Asset" id="fdefeds"  onload={hideModalLoader}>
+                                    <lightning-input-field field-name="Vendor_Account__c"   onchange={handleVendorChange} label="Vendor" > </lightning-input-field>
+                                    <lightning-input-field field-name="minimum_stock_quantity__c"   onchange={handleMINQuantityChage} label="Minimum Stocking Quantity" > </lightning-input-field>
+                                </lightning-record-edit-form>
+                                <lightning-input type="number" name="Quantity"  value={quantityVal} label="Quantity"  class="slds-m-bottom_medium"  onchange={quantityChange} ></lightning-input>
+                    
+                                <br>
+                                <template if:true={selectedPO}>
+                                    <template if:false={ChosenPoLine}>
+                                    <p class="slds-align_absolute-center">Choose A PO Line:</p></template>
+                                </template>
+                                <template if:false={ChosenPoLine}>
+                
+                                <ul class="poLineGrid">
+                                    <template for:each={selectedPOLines} for:item="item">
+                                        <li key={item} class="poLineGridItem">
+                                            <div class="poGrid ">
+                                                <div>Name:</div>
+                                                <div>{item.Name}</div>
+                                                <div></div>
+                                            </div>
+                                            <div class="poGrid ">
+                                                <div>Quantity:</div>
+                                                <div>{item.Quantity__c}</div>
+                                                <div><lightning-button variant="brand" class="slds-var-m-left_x-small" label="Select" title="Select" onclick={selectPoLine} data-record-id={item.Id} data-record-name={item.Name} data-record-description={item.Description__c}></lightning-button></div>
+                                            </div>
+                                            <div class="poGrid ">
+                                                <div>Description:</div>
+                                                <div>{item.Description__c}</div>
+                                                <div></div>
+                                            </div>                                                
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+
+
+                                <template if:true={ChosenPoLine}>
+                                    <lightning-card class="slds-card">
+                                    <!--desktop-->
+                                    <template if:false={isMobile}>
+                                        <div class="slds-p-around_medium">
+                                            <lightning-input class="scanTagInput" type="text" onchange={inputValChange} label="Scan Asset Tag/Serial #" value={inputVal} onkeypress={handleCreateAssetEnter} data-fieldname="scanTagInput" > </lightning-input>
+                                        </div>
+                                    </template>
+                                    <!--mobile-->
+                                    <!--<template if:true={isMobile}>
+                                        <div class="slds-align_absolute-center slds-m-vertical_large">
+                                            <lightning-button variant="brand" class="slds-var-m-left_x-small " disabled={scanButtonDisabled} icon-name="utility:scan" label="Scan Barcode" title="Open a camera view and look for a barcode to scan" onclick={handleBeginScanClick}></lightning-button>
+                                        </div>
+                                    </template>-->
+                                    <div class="poLineGrid">
+                                        <div  class="poLineGridItem">
+                                    <div class="poGrid">
+                                        <div>Name</div>
+                                        <div>{ChosenPoName}</div>
+                                        <div></div>
+                                    </div>
+                                    <div class="poGrid">
+                                        <div>Quantity</div>
+                                        <div>{ChosenPoQuant}</div>
+                                        <div><lightning-button variant="brand" class="slds-var-m-left_x-small" label="Change" title="Change" onclick={reset} ></lightning-button></div>
+                                    </div>
+                                    <div class="poGrid">
+                                        <div>Description</div>
+                                        <div>{ChosenPoDesc}</div>
+                                        <div></div>
+                                    </div>  </div>
+                                    </div>
+                                    
+                               </lightning-card> </template>
+
+                               <br>
+                    
+                        </div>
+                    </div>
+
+                    <!-- modal footer start-->
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={hidecreateAssetModal}>Cancel</button>
+             
+                            <button variant="brand" class="slds-button slds-button_neutral" data-record-id="" onclick={createAsset} >Submit</button>
+                 
+                        
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        <!-- modal end -->
+
+
+
+
+
+
+
+
+
+
+    </lightning-card>
+</template>
