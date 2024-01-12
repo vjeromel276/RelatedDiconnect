@@ -146,8 +146,8 @@ export default class InventoryCreateTags extends LightningElement {
             if (typeof dymo != "undefined") {
                 
                 console.log('===================== has dymo'  );
-                var previewLabel = dymo.label.framework.openLabelXml(data);
-                var pngData = previewLabel.render();
+                let previewLabel = dymo.label.framework.openLabelXml(data);
+                let pngData = previewLabel.render();
                 this.PreviewImageSrc = "data:image/png;base64," + pngData;
                 this.generalModalLoader = false;
             }

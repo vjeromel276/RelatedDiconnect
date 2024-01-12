@@ -1173,7 +1173,8 @@ global without sharing class InventoryGlobalController {
         
 
         //get record type for bulk asset
-        Id BulkAssetRecordTypeId = Schema.SObjectType.Asset.getRecordTypeInfosByName().get('Bulk').getRecordTypeId();
+        // Id BulkAssetRecordTypeId = Schema.SObjectType.Asset.getRecordTypeInfosByName().get('Bulk').getRecordTypeId();
+        Id BulkAssetRecordTypeId = '0123J000000MJgvQAG';
 
         //init a savepoint if need roll back
         Savepoint sp = Database.setSavepoint();
@@ -1411,7 +1412,8 @@ global without sharing class InventoryGlobalController {
         List<Asset> AssetsToUpdate = new List<Asset>();
         List<String> errors = new List<String>();
 
-        Id BulkAssetRecordTypeId = Schema.SObjectType.Asset.getRecordTypeInfosByName().get('Bulk').getRecordTypeId();
+        // Id BulkAssetRecordTypeId = Schema.SObjectType.Asset.getRecordTypeInfosByName().get('Bulk').getRecordTypeId();
+        Id BulkAssetRecordTypeId = '0123J000000MJgvQAG';
 
         List<Asset_Movement_History__c> mvmnthistorys =  new List<Asset_Movement_History__c>();
         
@@ -1430,11 +1432,19 @@ global without sharing class InventoryGlobalController {
         if(  errors.size() < 1  ) {  
 
 
-            Asset[] assets = [SELECT Id, Name, Quantity, RecordTypeId, Receiving__c, Receiving__r.Name, Warehouse__c  FROM Asset where Name = :AssetTagNum LIMIT 1 ];
+            Asset[] assets = [SELECT Id, Name, Bulk_Asset__c, Quantity, RecordTypeId, Receiving__c, Receiving__r.Name, Warehouse__c  FROM Asset where Name = :AssetTagNum LIMIT 1 ];
             if( assets != null && assets.size() > 0  ) {
                 for( Asset a : assets ) {
+                    System.debug('asset id:'+ a.Id);
+                    System.debug('asset name:'+ a.Name);
+                    System.debug('asset quantity:'+ a.Quantity);
+                    System.debug('asset bulk asset:'+ a.Bulk_Asset__c);
+                    // if( a.RecordTypeId == BulkAssetRecordTypeId && a.Quantity > 1 ) {
+                    if( a.Bulk_Asset__c == true && a.Quantity > 1 ) {
+                        System.debug('asset id:'+ a.Id);
+                        System.debug('asset name:'+ a.Name);
+                        System.debug('asset quantity:'+ a.Quantity);
 
-                    if( a.RecordTypeId == BulkAssetRecordTypeId && a.Quantity > 1 ) {
                         Decimal newQty;
                         newQty = a.Quantity + quantity;
                         a.Quantity = newQty;
