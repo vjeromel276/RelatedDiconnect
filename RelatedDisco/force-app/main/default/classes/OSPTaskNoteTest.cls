@@ -3,6 +3,7 @@ public with sharing class OSPTaskNoteTest{
 
 
 
+    @isTest
     testMethod static void one() {
 
 
