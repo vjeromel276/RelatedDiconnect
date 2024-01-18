@@ -574,15 +574,15 @@ export default class ReceiveAssets extends LightningElement {
   }
 
   handleBulkEnter(event) {
-    if (event.keyCode === 13) {
-      if (this.bulkInputVal.length) {
+    console.log("evemt key: " + event.key);
+    if (event.key === 'Enter') {
+      if (this.quantityVal>0) {
         this.submitScanToBulkItem();
       }
     }
   }
 
-  submitScanToBulkItem(e) {
-    e.preventDefault();
+  submitScanToBulkItem() {
     console.log(" submit scanned item");
     //clear errors
     this.showErrors = false;

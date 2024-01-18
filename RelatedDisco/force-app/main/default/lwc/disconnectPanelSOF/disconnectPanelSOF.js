@@ -170,7 +170,6 @@ export default class SOFDisconnectPanel extends LightningElement {
         return totalMonthsDifference;
     }
     
-
     columns = [
         { label: 'Milestone Name', fieldName: 'Milestone_Name__c', type: 'text' },
         { label: 'Task Name', fieldName: 'recordLink', type: 'url', typeAttributes: { label: { fieldName: 'Name' }, target: '_blank' } },
@@ -384,6 +383,7 @@ export default class SOFDisconnectPanel extends LightningElement {
     //     this.isCheckboxLoading = false;  // End loading
     //     return;
     // }
+
     handleDateChange( event ) {
         this.selectedDate = event.target.value;
         console.log( 'selectedDate', this.selectedDate );
@@ -462,9 +462,11 @@ export default class SOFDisconnectPanel extends LightningElement {
             } );
         }
     }
+
     hideButtons() {
         this.hasFormChanged = false;
     }
+
     // toast message helper function
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({

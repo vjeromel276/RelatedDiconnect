@@ -129,8 +129,8 @@
                     ></lightning-button>
                 </div>
             </template>
-
-            <template if:false={showScanBulkAsset}>
+<!-- changed -->
+            <template if:true={showScanBulkAsset}>
 
                 <template if:true={showDescriptionBox}>
                     <lightning-textarea
@@ -360,13 +360,13 @@
                         placeholder="Scan Existing Bulk Asset"
                     > </lightning-input>
 
-                    <lightning-button
+                    <!-- <lightning-button
                         variant="brand"
                         onclick={submitScanToBulkItem}
                         class="slds-var-m-left_x-small"
                         label="Enter"
                         title="Enter"
-                    ></lightning-button>
+                    ></lightning-button> -->
                     
                 </div>
             </template>
