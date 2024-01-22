@@ -9,82 +9,19 @@ public without sharing class SOFDisconnectPanelController {
     @AuraEnabled
     public static List<MPM4_BASE__Milestone1_Task__c> getTasks(String recordId) {
         List<MPM4_BASE__Milestone1_Task__c> tasks = new List<MPM4_BASE__Milestone1_Task__c>();
-        if ( Test.isRunningTest() ) {
+        tasks = [SELECT ID, Name, Milestone_Name__c, MPM4_BASE__Complete__c, 
+                        Not_Applicable__c, Resource_Name__c
+                 FROM MPM4_BASE__Milestone1_Task__c
+                 WHERE Service_Order_Agreement__c = :recordId AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
 
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
-            tasks = [SELECT ID, MPM4_BASE__Complete__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE MPM4_BASE__Complete__c = false
-                     Limit 1];
+
+        if ( tasks.size() > 0 ) {
+            System.debug(tasks);
             return tasks;
         }
         else {
-
-            tasks = [SELECT ID, Name, Milestone_Name__c, MPM4_BASE__Complete__c, 
-                            Not_Applicable__c, Resource_Name__c
-                     FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE Service_Order_Agreement__c = :recordId AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
-
-
-            if ( tasks.size() > 0 ) {
-                System.debug(tasks);
-                return tasks;
-            }
-            else {
-                return null;
-            }
-
+            System.debug('No tasks found');
+            return null;
         }
     }
 

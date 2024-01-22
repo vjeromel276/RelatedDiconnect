@@ -54,20 +54,20 @@ export default class SOFDisconnectPanel extends LightningElement {
         'Order.Id',
         'Order.Status',
         'Order.ContractId',
-        'Order.Disconnect_Date__c',
+        // 'Order.Disconnect_Date__c',
         'Order.Billing_Start_Date__c',
         'Order.Contract_End_Date_Est__c',
         'Order.Service_Order_Agreement_MRC_Amortized__c',
         'Order.PDF_Document_Comments__c',
         'Order.Service_End_Reason__c',
-        'Order.Customer_Requested_Disconnect_Date__c',
-        'Order.Disconnect_Contact__c',
-        'Order.Disconnect_Contact__r.Name',
-        'Order.Disconnect_Request_Received_Date__c',
+        // 'Order.Customer_Requested_Disconnect_Date__c',
+        // 'Order.Disconnect_Contact__c',
+        // 'Order.Disconnect_Contact__r.Name',
+        // 'Order.Disconnect_Request_Received_Date__c',
         'Order.End_Reason_Notes__c',
         'Order.Equipment_Pickup_Needed__c',
         'Order.Has_Successor__c',
-        'Order.Proceed_with_Disconnect__c',
+        // 'Order.Proceed_with_Disconnect__c',
         'Order.Service_End_Reasons__c',
         'Order.ServiceEndSub_Reasons__c',
         'Order.Quoted_ETF__c',
@@ -95,32 +95,32 @@ export default class SOFDisconnectPanel extends LightningElement {
             this.record = data;
             this.useNewTable = true;
             this.sofStatus = this.record.fields.Status.value;
-            this.hasChildSOF = this.record.fields.Has_Successor__c.value;
-            this.contractStatus = this.record.fields.Service_End_Reason__c.value;
-            this.contractId = this.record.fields.ContractId.value;
-            this.contractEndDateEst = this.record.fields.Contract_End_Date_Est__c.value;
-            this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
-            this.disconnectDate = this.record.fields.Disconnect_Date__c.value;
-            this.discoContact = this.record.fields.Disconnect_Contact__c.value;
-            this.discoContactName = this.record.fields.Disconnect_Contact__r.value;
-            this.discoReqRecievedDate = this.record.fields.Disconnect_Request_Received_Date__c.value;
-            this.endReasonNotes = this.record.fields.End_Reason_Notes__c.value;
-            this.equipPickupForDisco = this.record.fields.Equipment_Pickup_Needed__c.value;
-            this.proceedDisco = this.record.fields.Proceed_with_Disconnect__c.value;
-            this.serviceEndReason = this.record.fields.Service_End_Reasons__c.value;
-            this.status = this.record.fields.Status.value;
-            this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
-            this.qouteETF = this.record.fields.Quoted_ETF__c.value;
-            this.mrcAmortized = this.record.fields.Service_Order_Agreement_MRC_Amortized__c.value;
+            // this.hasChildSOF = this.record.fields.Has_Successor__c.value;
+            // this.contractStatus = this.record.fields.Service_End_Reason__c.value;
+            // this.contractId = this.record.fields.ContractId.value;
+            // this.contractEndDateEst = this.record.fields.Contract_End_Date_Est__c.value;
+            // this.custReqDiscoDate = this.record.fields.Customer_Requested_Disconnect_Date__c.value;
+            // this.disconnectDate = this.record.fields.Disconnect_Date__c.value;
+            // this.discoContact = this.record.fields.Disconnect_Contact__c.value;
+            // this.discoContactName = this.record.fields.Disconnect_Contact__r.value;
+            // this.discoReqRecievedDate = this.record.fields.Disconnect_Request_Received_Date__c.value;
+            // this.endReasonNotes = this.record.fields.End_Reason_Notes__c.value;
+            // this.equipPickupForDisco = this.record.fields.Equipment_Pickup_Needed__c.value;
+            // this.proceedDisco = this.record.fields.Proceed_with_Disconnect__c.value;
+            // this.serviceEndReason = this.record.fields.Service_End_Reasons__c.value;
+            // this.status = this.record.fields.Status.value;
+            // this.subReasons = this.record.fields.ServiceEndSub_Reasons__c.value;
+            // this.qouteETF = this.record.fields.Quoted_ETF__c.value;
+            // this.mrcAmortized = this.record.fields.Service_Order_Agreement_MRC_Amortized__c.value;
             this.contractLink = `/${ this.contractId }`;
-            console.log( 'this.sofStatus', this.sofStatus );
-            console.log( 'this.contractStatus', this.contractStatus );
-            console.log( 'this.contractId', this.contractId );
-            console.log( 'this.contractLink', this.contractLink );
+            // console.log( 'this.sofStatus', this.sofStatus );
+            // console.log( 'this.contractStatus', this.contractStatus );
+            // console.log( 'this.contractId', this.contractId );
+            // console.log( 'this.contractLink', this.contractLink );
             // console.log('this.contract', this.contract);
-            console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
-            console.log( 'this.disconnectDate', this.disconnectDate );
-            console.log( 'this.discoContact', this.discoContact );
+            // console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
+            // console.log( 'this.disconnectDate', this.disconnectDate );
+            // console.log( 'this.discoContact', this.discoContact );
 
 
             // can add multiple if statements to check for different statuses
@@ -129,25 +129,25 @@ export default class SOFDisconnectPanel extends LightningElement {
             }
 
         } else if ( error ) {
-            console.log( 'error', error );
+            console.log( 'error', JSON.stringify(error) +' '+ this.recordId );
         }
     }
 
-    @wire( getRecord, { recordId: '$contractId', fields: '$fields2' } )
-    getContractData ( { error, data } ) {
-        this.isLoading = true;
-        if ( data ) {
-            this.isLoading = false;
-            console.log( 'data', data );
-            this.contractData = data;
-            this.terminationLiability = this.contractData.fields.Termination_Liability__c.value;
-            this.contractNumber = this.contractData.fields.ContractNumber.value;
-            console.log( 'this.termLiab', this.terminationLiability );
-            console.log( 'this.contractNumber', this.contractNumber );
-        } else if ( error ) {
-            console.log( 'error', error );
-        }
-    }
+    // @wire( getRecord, { recordId: '$contractId', fields: '$fields2' } )
+    // getContractData ( { error, data } ) {
+    //     this.isLoading = true;
+    //     if ( data ) {
+    //         this.isLoading = false;
+    //         console.log( 'data', data );
+    //         this.contractData = data;
+    //         this.terminationLiability = this.contractData.fields.Termination_Liability__c.value;
+    //         this.contractNumber = this.contractData.fields.ContractNumber.value;
+    //         console.log( 'this.termLiab', this.terminationLiability );
+    //         console.log( 'this.contractNumber', this.contractNumber );
+    //     } else if ( error ) {
+    //         console.log( 'error', error );
+    //     }
+    // }
 
     getMonthsDifference ( otherDate ) {
         // Today's date
@@ -205,11 +205,11 @@ export default class SOFDisconnectPanel extends LightningElement {
                 // If it is greater than 30 days, set the disconnectDate to custReqDiscoDate
                 console.log( 'this.custReqDiscoDatec>30 from today' + this.custReqDiscoDate );
                 this.disconnectDate = this.custReqDiscoDate;
-                fields.Disconnect_Date__c = this.disconnectDate;
+                // fields.Disconnect_Date__c = this.disconnectDate;
                 console.log( 'this.disconnectDate: ' + this.disconnectDate );
             }
             console.log( 'this.custReqDiscoDate', this.custReqDiscoDate );
-            fields.Customer_Requested_Disconnect_Date__c = this.custReqDiscoDate;
+            // fields.Customer_Requested_Disconnect_Date__c = this.custReqDiscoDate;
         } else {
             // If it is less than 30 days, set the disconnectDate to 30 days from today
             console.log( 'this.custReqDiscoDatec < 30 from today' + this.custReqDiscoDate );
@@ -219,7 +219,7 @@ export default class SOFDisconnectPanel extends LightningElement {
             const mm = String( unformattedDisconnectDate.getMonth() + 1 ).padStart( 2, "0" );
             const yyyy = unformattedDisconnectDate.getFullYear();
             this.disconnectDate = yyyy + '-' + mm + '-' + dd;
-            fields.Disconnect_Date__c = this.disconnectDate;
+            // fields.Disconnect_Date__c = this.disconnectDate;
             console.log( 'this.disconnectDate: ' + this.disconnectDate );
         }
 
@@ -279,16 +279,19 @@ export default class SOFDisconnectPanel extends LightningElement {
     getTasks () {
         this.isLoading = true;
         const outputID = this.recordId;
+        console.log( 'outputID', outputID );
         // const updateTrys = 5;
         getTasks( { recordId: outputID } )
             .then( result => {
 
                 console.log( 'getTasks ' );
-                console.log( { result } );
+                // console.log( { result } );
+                console.log( 'result', JSON.stringify(result));
                 // this.result = result;
                 if ( result != null ) {
-
+                    console.log( 'not null result', JSON.stringify(result));
                     this.result = result;
+                    // console.log( 'this.result', this.result);
                     this.taskData = result.map( task => {
 
                         return {
@@ -301,7 +304,7 @@ export default class SOFDisconnectPanel extends LightningElement {
                     this.isDiscoInProg = true;
                     this.tasksFetchError = false;
                 } else {
-
+                    
                     this.isDiscoInProg = true;
                     this.tasksFetchError = true;
 
@@ -401,25 +404,31 @@ export default class SOFDisconnectPanel extends LightningElement {
         if ( e.target.fieldName === 'Equipment_Pickup_Needed__c' ) {
             this.equipPickupForDisco = e.target.value;
             console.log( this.equipPickupForDisco );
-        } else if ( e.target.fieldName === 'Customer_Requested_Disconnect_Date__c' ) {
-            this.selectedDate = e.target.value;
-            console.log( this.selectedDate );
-        } else if ( e.target.fieldName === 'Service_End_Reasons__c' ) {
+        } 
+        // else if ( e.target.fieldName === 'Customer_Requested_Disconnect_Date__c' ) {
+        //     this.selectedDate = e.target.value;
+        //     console.log( this.selectedDate );
+        // }
+        else if ( e.target.fieldName === 'Service_End_Reasons__c' ) {
             this.serviceEndReason = e.target.value;
             console.log( this.serviceEndReason );
-        } else if ( e.target.fieldName === 'ServiceEndSub_Reasons__c' ) {
+        } 
+        else if ( e.target.fieldName === 'ServiceEndSub_Reasons__c' ) {
             this.subReasons = e.target.value;
             console.log( this.subReasons );
-        } else if ( e.target.fieldName === 'Proceed_with_Disconnect__c' ) {
-            this.proceedDisco = e.target.value;
-            console.log( this.proceedDisco );
-        } else if ( e.target.fieldName === 'End_Reason_Notes__c' ) {
+        } 
+        // else if ( e.target.fieldName === 'Proceed_with_Disconnect__c' ) {
+        //     this.proceedDisco = e.target.value;
+        //     console.log( this.proceedDisco );
+        // } 
+        else if ( e.target.fieldName === 'End_Reason_Notes__c' ) {
             this.endReasonNotes = e.target.value;
             console.log( this.endReasonNotes );
-        } else if ( e.target.fieldName === 'Disconnect_Contact__c' ) {
-            this.discoContact = e.target.value;
-            console.log( this.discoContact );
-        }
+        } 
+        // else if ( e.target.fieldName === 'Disconnect_Contact__c' ) {
+        //     this.discoContact = e.target.value;
+        //     console.log( this.discoContact );
+        // }
 
         const formFields = {};
 
@@ -438,14 +447,14 @@ export default class SOFDisconnectPanel extends LightningElement {
         }
 
         formFields.Id = this.recordId;
-        formFields.Disconnect_Date__c = this.disconnectDate;
+        // formFields.Disconnect_Date__c = this.disconnectDate;
         formFields.Equipment_Pickup_Needed__c = this.equipPickupForDisco;
-        formFields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
+        // formFields.Customer_Requested_Disconnect_Date__c = this.selectedDate;
         formFields.Service_End_Reasons__c = this.serviceEndReason;
         formFields.ServiceEndSub_Reasons__c = this.subReasons;
-        formFields.Proceed_with_Disconnect__c = this.proceedDisco;
+        // formFields.Proceed_with_Disconnect__c = this.proceedDisco;
         formFields.End_Reason_Notes__c = this.endReasonNotes;
-        formFields.Disconnect_Contact__c = this.discoContact;
+        // formFields.Disconnect_Contact__c = this.discoContact;
         console.log( 'formFields', formFields );
         this.formFieldChanges = { formFields };
         console.log( 'formFieldChanges', this.formFieldChanges );
