@@ -1432,7 +1432,8 @@ global without sharing class InventoryGlobalController {
         if(  errors.size() < 1  ) {  
 
 
-            Asset[] assets = [SELECT Id, Name, Bulk_Asset__c, Quantity, RecordTypeId, Receiving__c, Receiving__r.Name, Warehouse__c  FROM Asset where Name = :AssetTagNum LIMIT 1 ];
+            // Asset[] assets = [SELECT Id, Name, Bulk_Asset__c, Quantity, RecordTypeId, Receiving__c, Receiving__r.Name, Warehouse__c  FROM Asset where Name = :AssetTagNum LIMIT 1 ];
+            Asset[] assets = [SELECT Id, Name, Bulk_Asset__c, Quantity, RecordTypeId, Receiving__c, Receiving__r.Name, Warehouse__c  FROM Asset where Name = :AssetTagNum AND Bulk_Asset__c = true LIMIT 1 ];
             if( assets != null && assets.size() > 0  ) {
                 for( Asset a : assets ) {
                     System.debug('asset id:'+ a.Id);
