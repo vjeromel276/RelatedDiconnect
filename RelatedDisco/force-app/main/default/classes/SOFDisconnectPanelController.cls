@@ -74,10 +74,7 @@ public without sharing class SOFDisconnectPanelController {
             tasks = [SELECT ID, Name, Milestone_Name__c, MPM4_BASE__Complete__c, 
                             Not_Applicable__c, Resource_Name__c
                      FROM MPM4_BASE__Milestone1_Task__c
-                     WHERE Service_Order_Agreement__c = :recordId 
-                     AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE 
-                     AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c 
-                     LIKE '%Disconnect%'];
+                     WHERE Service_Order_Agreement__c = :recordId AND MPM4_BASE__Project_Lookup__r.Primary_Project__c = TRUE AND MPM4_BASE__Project_Lookup__r.Initial_Project_Template_Chosen__c LIKE '%Disconnect%'];
 
 
             if ( tasks.size() > 0 ) {
